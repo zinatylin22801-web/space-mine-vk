@@ -1,826 +1,1199 @@
 <!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <title>Космическая шахта — Наследие</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#05070f">
+<title>Космическая шахта — Наследие</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<!-- Реальный VK Bridge: без сборщика, через script-тег -->
+<script src="https://unpkg.com/@vkontakte/vk-bridge/dist/vk-bridge.umd.js"></script>
+<style>
+:root{
+  color-scheme:dark;
+  --cyan:#7df9ff;
+  --violet:#8a6cff;
+  --amber:#ffb86b;
+  --pink:#ff7ad9;
+  --green:#67f7b2;
+  --gold:#ffd36b;
+  --red:#ff6b7d;
+  --stage:#b89a72;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color:#eaf0ff;
+  min-height:100dvh;
+  display:flex;
+  justify-content:center;
+  overflow-x:hidden;
+  position:relative;
+  background:
+    radial-gradient(1200px 700px at 50% -10%,#16204a 0%,transparent 60%),
+    radial-gradient(900px 600px at 90% 110%,#2a1248 0%,transparent 55%),
+    linear-gradient(180deg,#05070f 0%,#080c18 50%,#05060d 100%);
+}
 
-  <style>
-    :root {
-      --bg: #070b15;
-      --bg2: #0f172a;
-      --card: rgba(15, 23, 42, 0.82);
-      --line: rgba(148, 163, 184, 0.18);
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #22d3ee;
-      --accent2: #a855f7;
-      --good: #34d399;
-      --warn: #f59e0b;
-      --danger: #fb7185;
-      --skin: #22d3ee;
-      --skin2: #4c1d95;
-      --skin-glow: rgba(34, 211, 238, 0.5);
-    }
+.space-bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.stars{position:absolute;inset:-60%;pointer-events:none;background-repeat:repeat;will-change:transform,opacity}
+.stars.s1{
+  background-image:
+    radial-gradient(1px 1px at 25px 35px,#fff,transparent),
+    radial-gradient(1px 1px at 90px 120px,#bfe9ff,transparent),
+    radial-gradient(1.5px 1.5px at 160px 60px,#fff,transparent),
+    radial-gradient(1px 1px at 210px 180px,#e7d4ff,transparent),
+    radial-gradient(1px 1px at 40px 200px,#fff,transparent);
+  background-size:250px 250px;opacity:.85;
+  animation:sd1 90s linear infinite,tw 4s ease-in-out infinite;
+}
+.stars.s2{
+  background-image:
+    radial-gradient(1px 1px at 30px 50px,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 120px 30px,#9df,transparent),
+    radial-gradient(1px 1px at 80px 140px,#fff,transparent),
+    radial-gradient(1px 1px at 190px 90px,#ffd6f4,transparent);
+  background-size:170px 170px;opacity:.55;
+  animation:sd2 120s linear infinite,tw 6s ease-in-out infinite;animation-delay:-2s;
+}
+.stars.s3{
+  background-image:
+    radial-gradient(2px 2px at 60px 80px,rgba(255,255,255,.95),transparent),
+    radial-gradient(1px 1px at 140px 40px,#8fd9ff,transparent),
+    radial-gradient(1px 1px at 30px 160px,#fff,transparent),
+    radial-gradient(1.5px 1.5px at 180px 150px,#ff9de2,transparent);
+  background-size:320px 320px;opacity:.38;
+  animation:sd3 150s linear infinite,tw 7s ease-in-out infinite;animation-delay:-4s;
+}
+@keyframes sd1{from{transform:translate3d(0,0,0)}to{transform:translate3d(-120px,-70px,0)}}
+@keyframes sd2{from{transform:translate3d(0,0,0)}to{transform:translate3d(90px,-110px,0)}}
+@keyframes sd3{from{transform:translate3d(0,0,0)}to{transform:translate3d(-70px,120px,0)}}
+@keyframes tw{0%,100%{opacity:.45}50%{opacity:1}}
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+.nebula{position:absolute;border-radius:50%;filter:blur(48px);opacity:.42;pointer-events:none}
+.nebula.n1{width:360px;height:360px;top:-70px;left:-80px;background:radial-gradient(circle,rgba(125,249,255,.32),transparent 70%);animation:d1 26s ease-in-out infinite alternate}
+.nebula.n2{width:420px;height:420px;bottom:-120px;right:-100px;background:radial-gradient(circle,rgba(138,108,255,.36),transparent 70%);animation:d2 32s ease-in-out infinite alternate}
+.nebula.n3{width:300px;height:300px;top:42%;left:58%;background:radial-gradient(circle,rgba(255,122,217,.22),transparent 70%);animation:d1 38s ease-in-out infinite alternate;opacity:.26}
+@keyframes d1{from{transform:translate(0,0) scale(1)}to{transform:translate(45px,32px) scale(1.05)}}
+@keyframes d2{from{transform:translate(0,0) scale(1)}to{transform:translate(-55px,-22px) scale(1.08)}}
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      background:
-        radial-gradient(circle at top, rgba(34, 211, 238, 0.12), transparent 35%),
-        radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.12), transparent 35%),
-        linear-gradient(180deg, var(--bg), var(--bg2));
-      color: var(--text);
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      overflow-x: hidden;
-    }
+.meteor{position:absolute;z-index:0;pointer-events:none;width:140px;height:2px;border-radius:2px;background:linear-gradient(90deg,transparent,rgba(125,249,255,.9));box-shadow:0 0 10px rgba(125,249,255,.65);opacity:0}
+.meteor:before{content:"";position:absolute;right:-3px;top:-3px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 14px 4px rgba(125,249,255,.95)}
+.meteor.m1{top:8%;left:-180px;animation:met 8s linear infinite}
+.meteor.m2{top:34%;left:-180px;animation:met 11s linear infinite;animation-delay:3.5s;background:linear-gradient(90deg,transparent,rgba(255,122,217,.85));box-shadow:0 0 10px rgba(255,122,217,.55)}
+.meteor.m3{top:61%;left:-180px;animation:met 13s linear infinite;animation-delay:6s}
+@keyframes met{0%{transform:translate(0,0) rotate(20deg);opacity:0}8%{opacity:1}72%{opacity:1}100%{transform:translate(130vw,48vh) rotate(20deg);opacity:0}}
 
-    button { font: inherit; color: inherit; border: 0; cursor: pointer; }
+.planet{position:absolute;border-radius:50%;z-index:0;pointer-events:none}
+.planet.p1{width:150px;height:150px;top:6%;right:-42px;background:radial-gradient(circle at 34% 30%,#8fd9ff,#3a2f86 58%,#120a2e 100%);box-shadow:0 0 58px rgba(125,249,255,.32),inset -14px -14px 38px rgba(0,0,0,.68)}
+.planet.p1 .ring{position:absolute;left:50%;top:50%;width:250%;height:40px;transform:translate(-50%,-50%) rotate(-22deg);border-radius:50%;border:3px solid rgba(125,249,255,.48);border-top-color:transparent;border-bottom-color:transparent;box-shadow:0 0 20px rgba(125,249,255,.25)}
+.planet.p2{width:104px;height:104px;bottom:7%;left:-34px;background:radial-gradient(circle at 35% 30%,#c9a0ff,#5a2f86 60%,#1a0a2e);box-shadow:0 0 44px rgba(138,108,255,.32),inset -10px -10px 28px rgba(0,0,0,.62)}
+.ship{position:absolute;bottom:25%;left:-260px;width:150px;height:42px;z-index:0;pointer-events:none;animation:shipFly 42s linear infinite;animation-delay:9s;opacity:0}
+.ship .hull{position:absolute;left:28px;top:12px;width:88px;height:18px;border-radius:18px 28px 28px 18px;background:linear-gradient(180deg,#dbe7ff,#8aa0d8 45%,#303b68);box-shadow:0 0 18px rgba(125,249,255,.22),inset 0 -4px 8px rgba(0,0,0,.35)}
+.ship .cockpit{position:absolute;left:96px;top:15px;width:20px;height:10px;border-radius:10px 14px 14px 10px;background:linear-gradient(180deg,rgba(125,249,255,.95),rgba(50,120,200,.75));box-shadow:0 0 14px rgba(125,249,255,.65)}
+.ship .engine{position:absolute;left:16px;top:15px;width:18px;height:12px;border-radius:50%;background:radial-gradient(circle,#fff,var(--cyan) 35%,rgba(125,249,255,.15) 70%,transparent);box-shadow:0 0 22px rgba(125,249,255,.75);animation:ep 1.1s ease-in-out infinite}
+@keyframes shipFly{0%{transform:translate(0,0) rotate(-4deg);opacity:0}6%{opacity:1}94%{opacity:1}100%{transform:translate(145vw,-12vh) rotate(-4deg);opacity:0}}
+@keyframes ep{0%,100%{transform:scaleX(1);opacity:.85}50%{transform:scaleX(1.35);opacity:1}}
 
-    #stars {
-      position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
-      background:
-        radial-gradient(circle at 18% 22%, rgba(34,211,238,0.10), transparent 40%),
-        radial-gradient(circle at 82% 78%, rgba(168,85,247,0.10), transparent 40%);
-    }
-    #stars i {
-      position: absolute; width: 2px; height: 2px; border-radius: 50%;
-      background: #fff; opacity: 0.8; animation: twinkle 3s ease-in-out infinite;
-    }
-    @keyframes twinkle { 0%,100% { opacity: 0.25; } 50% { opacity: 0.95; } }
+.vignette{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,.58) 100%)}
 
-    #app { position: relative; z-index: 1; width: min(100%, 520px); margin: 0 auto; padding: 14px 14px 28px; }
-    header, .mine, .panel { position: relative; z-index: 1; }
+.tier-layer{position:absolute;inset:0;display:none;pointer-events:none}
+body[data-tier="0"] .tier-0{display:block}
+body[data-tier="1"] .tier-1{display:block}
+body[data-tier="2"] .tier-2{display:block}
+body[data-tier="3"] .tier-3{display:block}
 
-    header {
-      padding: 12px; border: 1px solid var(--line); border-radius: 22px;
-      background: var(--card); backdrop-filter: blur(12px);
-      box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
-    }
-    h1 { margin: 0; font-size: 24px; line-height: 1.1; letter-spacing: -0.02em; }
-    .sub { margin-top: 4px; color: var(--muted); font-size: 13px; }
+.tier-0 .ground{position:absolute;left:-15%;right:-15%;bottom:-18%;height:42%;background:radial-gradient(ellipse at 50% 0%,#5a4634,#201812 65%,transparent 100%);filter:blur(2px);opacity:.72}
+.tier-0 .pebble{position:absolute;border-radius:45% 55% 50% 50%/55% 45% 60% 40%;background:radial-gradient(circle at 35% 30%,#9b8065,#4d3b2c 65%,#1b1410);box-shadow:0 0 10px rgba(184,154,114,.25)}
+.tier-0 .p1{width:42px;height:32px;left:12%;bottom:18%;transform:rotate(12deg)}
+.tier-0 .p2{width:28px;height:22px;right:18%;bottom:24%;transform:rotate(-18deg)}
+.tier-0 .p3{width:18px;height:14px;left:38%;bottom:12%}
 
-    .stats { margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .stat { padding: 10px; border-radius: 16px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
-    .stat small { display: block; color: var(--muted); font-size: 11px; margin-bottom: 4px; }
-    .stat b { font-size: 16px; word-break: break-word; }
+.tier-1 .belt{position:absolute;inset:0;background:radial-gradient(circle at 20% 70%,rgba(125,249,255,.08),transparent 25%),radial-gradient(circle at 80% 30%,rgba(138,108,255,.09),transparent 25%)}
+.tier-1 .rock{position:absolute;border-radius:48% 52% 55% 45%/52% 48% 55% 45%;background:radial-gradient(circle at 35% 30%,#7d88b8,#30375f 65%,#11152b);box-shadow:0 0 12px rgba(125,249,255,.25);animation:floatRock 9s ease-in-out infinite}
+.tier-1 .r1{width:36px;height:30px;left:10%;top:28%}
+.tier-1 .r2{width:22px;height:18px;right:14%;top:42%;animation-delay:-2s}
+.tier-1 .r3{width:28px;height:24px;left:22%;bottom:20%;animation-delay:-4s}
+@keyframes floatRock{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-18px) rotate(8deg)}}
 
-    .mine {
-      margin-top: 14px; padding: 14px; border-radius: 24px; border: 1px solid var(--line);
-      background: var(--card); backdrop-filter: blur(12px); text-align: center;
-    }
-    #combo {
-      display: inline-block; min-width: 110px; padding: 6px 10px; border-radius: 999px;
-      background: rgba(34,211,238,0.12); border: 1px solid rgba(34,211,238,0.2);
-      color: var(--accent); font-weight: 800; font-size: 13px;
-    }
+.tier-2 .atmo{position:absolute;left:50%;top:50%;width:520px;height:520px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(138,108,255,.16),transparent 62%);filter:blur(10px)}
+.tier-2 .orbitRing{position:absolute;left:50%;top:50%;width:430px;height:120px;transform:translate(-50%,-50%) rotate(-18deg);border-radius:50%;border:2px solid rgba(159,208,255,.28);border-top-color:transparent;border-bottom-color:transparent;box-shadow:0 0 22px rgba(138,108,255,.18)}
+.tier-2 .moon{position:absolute;left:50%;top:50%;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#b7c7e8 60%,#4a557a);box-shadow:0 0 14px rgba(255,255,255,.35);animation:moonOrbit 14s linear infinite}
+@keyframes moonOrbit{from{transform:translate(-50%,-50%) rotate(0) translateX(230px)}to{transform:translate(-50%,-50%) rotate(360deg) translateX(230px)}}
 
-    .asteroid-wrap { position: relative; margin: 16px auto 8px; width: 220px; height: 220px; display: grid; place-items: center; }
+.tier-3 .coronaBg{position:absolute;left:50%;top:50%;width:680px;height:680px;transform:translate(-50%,-50%);border-radius:50%;background:repeating-conic-gradient(from 0deg,rgba(255,211,107,.18) 0 5deg,transparent 5deg 18deg);filter:blur(10px);animation:spinSlow 28s linear infinite}
+.tier-3 .flare{position:absolute;left:50%;top:50%;width:260px;height:260px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.28),rgba(255,184,107,.18) 35%,transparent 68%);filter:blur(8px);animation:ph 2.4s ease-in-out infinite}
+@keyframes spinSlow{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-    .asteroid {
-      width: 190px; height: 190px; border-radius: 50%;
-      background:
-        radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55), transparent 22%),
-        radial-gradient(circle at 70% 72%, rgba(0,0,0,0.45), transparent 30%),
-        radial-gradient(circle at 50% 50%, var(--skin), var(--skin2) 72%, #0b1020 100%);
-      box-shadow:
-        inset -16px -16px 34px rgba(0,0,0,0.5),
-        inset 12px 12px 26px rgba(255,255,255,0.18),
-        0 0 0 2px rgba(103,232,249,0.55),
-        0 0 38px var(--skin-glow),
-        0 20px 60px rgba(0,0,0,0.45);
-      transition: transform 120ms ease, box-shadow 200ms ease;
-      touch-action: manipulation;
-    }
-    .asteroid:active { transform: scale(0.96); }
-    .asteroid.pulse { animation: pulse 180ms ease; }
-    @keyframes pulse { 0% { transform: scale(1); } 40% { transform: scale(0.94); } 100% { transform: scale(1); } }
-    .asteroid.crit-flash {
-      box-shadow:
-        inset -16px -16px 34px rgba(0,0,0,0.5),
-        inset 12px 12px 26px rgba(255,255,255,0.3),
-        0 0 0 4px #fde047,
-        0 0 60px rgba(253,224,71,0.85),
-        0 20px 60px rgba(0,0,0,0.45);
-    }
+.app{position:relative;z-index:2;width:100%;max-width:520px;padding:18px 16px 28px;display:flex;flex-direction:column;gap:14px}
+.app.shake{animation:appShake .35s ease}
+@keyframes appShake{0%,100%{transform:translate(0,0)}15%{transform:translate(-6px,3px)}30%{transform:translate(6px,-3px)}45%{transform:translate(-5px,-2px)}60%{transform:translate(5px,2px)}75%{transform:translate(-3px,1px)}}
 
-    #clickInfo { color: var(--muted); font-size: 13px; margin-top: 4px; }
-    #boostStatus { margin-top: 10px; font-size: 13px; color: var(--warn); min-height: 18px; }
+.header{position:relative;text-align:center}
+h1{margin:0 0 2px;font-size:26px;letter-spacing:2px;text-transform:uppercase;background:linear-gradient(90deg,var(--stage),var(--violet),var(--pink),var(--stage));background-size:280% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:0 0 24px rgba(125,249,255,.22);animation:titleShine 8s linear infinite}
+@keyframes titleShine{from{background-position:0% 0}to{background-position:280% 0}}
+.tier-line{font-size:13px;color:var(--stage);letter-spacing:.5px;text-shadow:0 0 10px rgba(125,249,255,.3);font-weight:800}
+.subtitle{color:#8fa0c8;font-size:12px;letter-spacing:.4px;margin-top:2px}
 
-    .actions { margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .btn {
-      padding: 12px 10px; border-radius: 16px; background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.08); font-weight: 700; font-size: 13px;
-      transition: transform 120ms ease, background 120ms ease, opacity 120ms ease;
-    }
-    .btn:hover { background: rgba(255,255,255,0.09); }
-    .btn:active { transform: scale(0.98); }
-    .btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    .btn.primary { background: linear-gradient(135deg, rgba(34,211,238,0.22), rgba(168,85,247,0.22)); border-color: rgba(34,211,238,0.25); }
-    .btn.good { background: rgba(52,211,153,0.14); border-color: rgba(52,211,153,0.22); }
-    .btn.danger { background: rgba(251,113,133,0.12); border-color: rgba(251,113,133,0.2); }
+.sound-btn{position:absolute;top:-2px;right:0;width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;background:linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,.02));border:1px solid rgba(125,249,255,.26);color:var(--cyan);box-shadow:0 0 16px rgba(125,249,255,.16);-webkit-tap-highlight-color:transparent}
+.sound-btn:active{transform:scale(.94)}
+.sound-btn svg{width:23px;height:23px}
+.sound-btn .slash{display:none}
+.sound-btn.muted{color:#6f7da0;border-color:rgba(255,255,255,.12);box-shadow:none;background:rgba(255,255,255,.04)}
+.sound-btn.muted .wave{display:none}
+.sound-btn.muted .slash{display:block;stroke:#ff7a8a}
 
-    .panel {
-      margin-top: 14px; padding: 14px; border-radius: 24px; border: 1px solid var(--line);
-      background: var(--card); backdrop-filter: blur(12px);
-    }
-    .panel h2 { margin: 0 0 10px; font-size: 18px; }
-    .panel h3 { margin: 14px 0 8px; font-size: 15px; color: var(--muted); font-weight: 700; }
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat,.panel{background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.028));border:1px solid rgba(125,249,255,.18);border-radius:16px;padding:11px 13px;box-shadow:inset 0 0 24px rgba(125,249,255,.05),0 6px 20px rgba(0,0,0,.35)}
+.stat-label{font-size:11px;color:#9fb0d0;letter-spacing:.4px}
+.stat-value{font-size:20px;font-weight:900;margin-top:3px;color:#fff;text-shadow:0 0 12px rgba(125,249,255,.35);display:inline-block}
+.stat-value.bump{animation:bump .22s ease}
+@keyframes bump{0%{transform:scale(1)}40%{transform:scale(1.22);color:var(--stage)}100%{transform:scale(1)}}
+#crystals:before{content:"◆ ";color:var(--stage);text-shadow:0 0 10px var(--stage)}
+#shards:before{content:"✹ ";color:var(--gold);text-shadow:0 0 10px var(--gold)}
+#legacyMult{color:var(--gold)}
 
-    .upgrade {
-      display: flex; justify-content: space-between; gap: 10px; align-items: center;
-      padding: 10px; border-radius: 16px; background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06); margin-bottom: 8px;
-    }
-    .upgrade b { display: block; font-size: 14px; }
-    .muted { color: var(--muted); font-size: 12px; }
-    .buy-btn {
-      min-width: 112px; padding: 10px; border-radius: 14px; background: rgba(34,211,238,0.12);
-      border: 1px solid rgba(34,211,238,0.18); font-weight: 800; font-size: 12px;
-    }
-    .buy-btn:disabled { opacity: 0.45; cursor: not-allowed; }
-    #synergyText { color: var(--muted); font-size: 13px; line-height: 1.45; }
+.mine-wrap{position:relative;display:flex;justify-content:center;align-items:center;padding:24px 0 16px;min-height:340px}
+.halo{position:absolute;width:315px;height:315px;border-radius:50%;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(125,249,255,.32),rgba(138,108,255,.18) 42%,transparent 72%);filter:blur(8px);animation:ph 3.2s ease-in-out infinite}
+@keyframes ph{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.09);opacity:1}}
+body[data-tier="0"] .halo{width:230px;height:230px;background:radial-gradient(circle,rgba(184,154,114,.30),rgba(120,90,60,.15) 42%,transparent 72%)}
+body[data-tier="2"] .halo{width:380px;height:380px;background:radial-gradient(circle,rgba(138,108,255,.34),rgba(125,249,255,.16) 42%,transparent 72%)}
+body[data-tier="3"] .halo{width:430px;height:430px;background:radial-gradient(circle,rgba(255,211,107,.42),rgba(255,120,60,.22) 42%,transparent 72%)}
 
-    .overlay {
-      position: fixed; inset: 0; background: rgba(2,6,23,0.72); backdrop-filter: blur(8px);
-      display: grid; place-items: center; padding: 16px; z-index: 50;
-    }
-    .overlay.hidden { display: none; }
-    .modal {
-      width: min(100%, 460px); max-height: 82vh; overflow: auto; padding: 16px; border-radius: 24px;
-      background: linear-gradient(180deg, rgba(15,23,42,0.98), rgba(2,6,23,0.98));
-      border: 1px solid var(--line); box-shadow: 0 30px 90px rgba(0,0,0,0.45);
-    }
-    .modal h2 { margin: 0 0 10px; font-size: 20px; }
-    .modal p { margin: 8px 0; color: var(--muted); line-height: 1.45; font-size: 14px; }
-    .modal-actions { display: grid; gap: 8px; margin-top: 14px; }
-    .list { display: grid; gap: 8px; margin-top: 10px; }
-    .list-item {
-      padding: 10px; border-radius: 16px; background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between;
-      gap: 10px; align-items: center;
-    }
-    .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: rgba(255,255,255,0.06); color: var(--muted); font-size: 11px; font-weight: 700; }
+.corona{position:absolute;width:390px;height:390px;border-radius:50%;pointer-events:none;z-index:0;display:none;background:repeating-conic-gradient(from 0deg,rgba(255,211,107,.22) 0 6deg,transparent 6deg 18deg);filter:blur(7px);animation:spinSlow 18s linear infinite}
+body[data-tier="3"] .corona{display:block}
 
-    #toasts { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 80; display: grid; gap: 8px; width: min(92vw, 420px); pointer-events: none; }
-    .toast {
-      padding: 10px 12px; border-radius: 14px; background: rgba(2,6,23,0.92); border: 1px solid var(--line);
-      color: var(--text); font-size: 13px; box-shadow: 0 12px 30px rgba(0,0,0,0.25); animation: toastIn 180ms ease;
-    }
-    @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+.combo{position:absolute;top:6px;left:50%;transform:translateX(-50%);z-index:3;pointer-events:none;font-weight:900;font-size:18px;letter-spacing:1px;color:var(--gold);text-shadow:0 0 14px rgba(255,211,107,.8);opacity:0;transition:opacity .25s ease,transform .12s ease}
+.combo.show{opacity:1}
+.combo.pop{transform:translateX(-50%) scale(1.3)}
 
-    #fx { position: fixed; inset: 0; pointer-events: none; z-index: 70; }
-    .float {
-      position: absolute; transform: translate(-50%, -50%); color: var(--accent); font-weight: 900;
-      font-size: 16px; text-shadow: 0 4px 16px rgba(0,0,0,0.45); animation: floatUp 900ms ease forwards; white-space: nowrap;
-    }
-    .float.crit { color: #fde047; font-size: 20px; }
-    @keyframes floatUp {
-      0% { opacity: 1; transform: translate(-50%, -50%) scale(0.9); }
-      20% { opacity: 1; transform: translate(-50%, -70%) scale(1.05); }
-      100% { opacity: 0; transform: translate(-50%, -160%) scale(0.95); }
-    }
-    .spark {
-      position: absolute; width: 6px; height: 6px; border-radius: 50%; pointer-events: none; z-index: 71;
-      box-shadow: 0 0 8px currentColor; animation: sparkFly 600ms ease-out forwards;
-    }
-    @keyframes sparkFly {
-      0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.2); opacity: 0; }
-    }
-    .center { text-align: center; }
-    .small { font-size: 12px; }
-  </style>
+.orbit{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:0}
+.orbit-debris{width:345px;height:345px;animation:orb 30s linear infinite}
+.orbit-crystals{width:292px;height:292px;animation:orbRev 22s linear infinite}
+.orbit-drones{width:265px;height:265px;animation:orb 15s linear infinite}
+.orbit-drills{width:310px;height:310px;animation:orbRev 19s linear infinite}
+@keyframes orb{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes orbRev{to{transform:translate(-50%,-50%) rotate(-360deg)}}
+
+.shard{position:absolute;left:50%;top:50%;border-radius:43% 57% 52% 48%/55% 45% 60% 40%;background:radial-gradient(circle at 35% 30%,#69739a,#2a2f4d 65%,#12142a);box-shadow:0 0 8px rgba(125,249,255,.34),inset -2px -2px 6px rgba(0,0,0,.65)}
+.shard.s1{width:15px;height:15px;transform:rotate(0deg) translateY(-164px)}
+.shard.s2{width:10px;height:10px;transform:rotate(95deg) translateY(-145px);box-shadow:0 0 8px rgba(255,122,217,.42),inset -2px -2px 6px rgba(0,0,0,.65)}
+.shard.s3{width:12px;height:12px;transform:rotate(200deg) translateY(-168px)}
+.shard.s4{width:8px;height:8px;transform:rotate(300deg) translateY(-138px);box-shadow:0 0 8px rgba(255,184,107,.42),inset -1px -1px 5px rgba(0,0,0,.65)}
+
+.crystal{position:absolute;left:50%;top:50%;width:12px;height:18px;background:linear-gradient(180deg,rgba(255,255,255,.95),var(--stage) 45%,rgba(70,160,220,.75));clip-path:polygon(50% 0,100% 32%,78% 100%,22% 100%,0 32%);box-shadow:0 0 12px var(--stage);opacity:.9;animation:cp 2.4s ease-in-out infinite}
+.crystal.k1{transform:rotate(35deg) translateY(-132px)}
+.crystal.k2{transform:rotate(155deg) translateY(-126px);animation-delay:-.8s;background:linear-gradient(180deg,#fff,var(--pink) 45%,rgba(180,60,150,.75));box-shadow:0 0 12px rgba(255,122,217,.7)}
+.crystal.k3{transform:rotate(265deg) translateY(-138px);animation-delay:-1.5s;background:linear-gradient(180deg,#fff,var(--amber) 45%,rgba(190,110,40,.75));box-shadow:0 0 12px rgba(255,184,107,.65)}
+@keyframes cp{0%,100%{filter:brightness(1) drop-shadow(0 0 4px rgba(125,249,255,.35))}50%{filter:brightness(1.35) drop-shadow(0 0 10px rgba(125,249,255,.65))}}
+
+.mini-drone,.mini-drill{position:absolute;left:50%;top:50%;opacity:0;transition:opacity .45s ease;pointer-events:none}
+.mini-drone.show,.mini-drill.show{opacity:.96}
+.mini-drone{width:20px;height:20px;border:2px solid rgba(138,108,255,.95);border-radius:50%;background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.75),rgba(138,108,255,.45) 55%,rgba(40,25,90,.75));box-shadow:0 0 12px rgba(138,108,255,.75)}
+.mini-drone:before,.mini-drone:after{content:"";position:absolute;background:rgba(190,170,255,.9);border-radius:2px;box-shadow:0 0 8px rgba(138,108,255,.7)}
+.mini-drone:before{width:28px;height:2px;left:-6px;top:9px}
+.mini-drone:after{width:2px;height:28px;left:9px;top:-6px}
+.mini-drone.d1{transform:rotate(0deg) translateY(-122px)}
+.mini-drone.d2{transform:rotate(120deg) translateY(-122px)}
+.mini-drone.d3{transform:rotate(240deg) translateY(-122px)}
+.mini-drill{width:13px;height:20px;background:linear-gradient(180deg,#dffcff,var(--stage) 45%,#246a88);clip-path:polygon(50% 0,100% 24%,82% 100%,18% 100%,0 24%);box-shadow:0 0 12px var(--stage)}
+.mini-drill.r1{transform:rotate(55deg) translateY(-142px)}
+.mini-drill.r2{transform:rotate(175deg) translateY(-142px)}
+.mini-drill.r3{transform:rotate(295deg) translateY(-142px)}
+
+.mine-btn{position:relative;z-index:1;width:210px;height:210px;border-radius:50%;border:3px solid rgba(125,249,255,.58);cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-tap-highlight-color:transparent;overflow:hidden;display:flex;align-items:center;justify-content:center;color:#fff;background:radial-gradient(circle at 32% 28%,#7484df 0%,#3a3f86 38%,#1c1d44 70%,#0c0d22 100%);box-shadow:0 0 46px rgba(125,249,255,.36),inset -18px -22px 52px rgba(0,0,0,.62),inset 14px 16px 42px rgba(160,180,255,.26);transition:width .45s ease,height .45s ease,background .45s ease,border-color .45s ease,box-shadow .45s ease}
+.mine-btn.hit{animation:hit .18s ease}
+@keyframes hit{0%{transform:scale(1)}30%{transform:scale(.93) translate(3px,-2px)}60%{transform:scale(1.03) translate(-3px,2px)}100%{transform:scale(1)}}
+
+body[data-tier="0"] .mine-btn{width:150px;height:150px;border-color:#a1866b;background:radial-gradient(circle at 32% 28%,#c7b39a,#7b654f 45%,#3a2d22 75%,#15100c);box-shadow:0 0 30px rgba(184,154,114,.35),inset -14px -18px 40px rgba(0,0,0,.7),inset 10px 12px 30px rgba(255,230,200,.18)}
+body[data-tier="1"] .mine-btn{width:220px;height:220px;border-color:rgba(125,249,255,.62);background:radial-gradient(circle at 32% 28%,#8ea0ff,#444b9a 38%,#1d204d 70%,#0b0d22);box-shadow:0 0 46px rgba(125,249,255,.38),inset -18px -22px 52px rgba(0,0,0,.62),inset 14px 16px 42px rgba(180,200,255,.24)}
+body[data-tier="2"] .mine-btn{width:270px;height:270px;border-color:rgba(159,208,255,.65);background:radial-gradient(circle at 32% 28%,#b48cff,#5b3aa8 36%,#23144f 70%,#080418);box-shadow:0 0 58px rgba(138,108,255,.45),inset -20px -24px 58px rgba(0,0,0,.68),inset 16px 18px 46px rgba(210,190,255,.25)}
+body[data-tier="3"] .mine-btn{width:300px;height:300px;border-color:rgba(255,211,107,.75);background:radial-gradient(circle at 35% 30%,#fff7d4,#ffd36b 28%,#ff8a3c 58%,#8d1d0b 82%,#240503);box-shadow:0 0 80px rgba(255,184,107,.55),inset -22px -26px 60px rgba(70,0,0,.62),inset 18px 20px 48px rgba(255,255,220,.35)}
+
+.mine-btn.skin-ice{border-color:rgba(160,230,255,.7);background:radial-gradient(circle at 32% 28%,#dff6ff 0%,#7fc8ef 35%,#2b6f9e 70%,#0c2740 100%);box-shadow:0 0 46px rgba(160,230,255,.45),inset -18px -22px 52px rgba(0,20,40,.6),inset 14px 16px 42px rgba(220,245,255,.35)}
+.mine-btn.skin-ice .mine-label span{color:#bff0ff}
+.mine-btn.skin-lava{border-color:rgba(255,140,80,.7);background:radial-gradient(circle at 32% 28%,#ffd9a0 0%,#ff7a3c 32%,#a8281a 68%,#2a0806 100%);box-shadow:0 0 50px rgba(255,120,60,.5),inset -18px -22px 52px rgba(40,0,0,.65),inset 14px 16px 42px rgba(255,200,150,.3)}
+.mine-btn.skin-lava .mine-label span{color:#ffd9a0}
+.mine-btn.skin-emerald{border-color:rgba(120,255,190,.7);background:radial-gradient(circle at 32% 28%,#d6ffe9 0%,#46d99a 34%,#157a52 70%,#06281c 100%);box-shadow:0 0 46px rgba(103,247,178,.45),inset -18px -22px 52px rgba(0,30,18,.62),inset 14px 16px 42px rgba(200,255,225,.3)}
+.mine-btn.skin-emerald .mine-label span{color:#9dffd0}
+.mine-btn.skin-void{border-color:rgba(180,140,255,.7);background:radial-gradient(circle at 32% 28%,#b39cff 0%,#5a2fa8 36%,#1c0a3e 72%,#05010c 100%);box-shadow:0 0 52px rgba(138,108,255,.55),inset -18px -22px 54px rgba(0,0,0,.75),inset 14px 16px 42px rgba(180,150,255,.28)}
+.mine-btn.skin-void .mine-label span{color:#cdbcff}
+
+.crater,.vein,.mine-label{pointer-events:none}
+.crater{position:absolute;border-radius:50%;background:radial-gradient(circle at 40% 35%,rgba(0,0,0,.58),rgba(0,0,0,.16) 60%,transparent 76%);box-shadow:inset 2px 3px 7px rgba(0,0,0,.62),0 0 5px rgba(125,249,255,.16)}
+.c1{width:46px;height:46px;top:22%;left:18%}.c2{width:30px;height:30px;top:58%;left:30%}
+.c3{width:56px;height:56px;top:40%;right:12%}.c4{width:22px;height:22px;top:16%;right:26%}
+.c5{width:34px;height:34px;bottom:14%;right:30%}
+.vein{position:absolute;width:3px;border-radius:3px;opacity:.82;background:linear-gradient(180deg,transparent,var(--stage),transparent);box-shadow:0 0 9px var(--stage)}
+.v1{height:62px;top:30%;left:46%;transform:rotate(18deg)}
+.v2{height:42px;top:50%;left:60%;transform:rotate(-30deg)}
+.v3{height:34px;top:62%;left:38%;transform:rotate(48deg);opacity:.55}
+.mine-label{position:relative;z-index:2;font-size:22px;font-weight:900;letter-spacing:1px;line-height:1.3;text-shadow:0 2px 10px rgba(0,0,0,.72)}
+.mine-label span{color:var(--stage)}
+
+.float-text{position:fixed;pointer-events:none;font-weight:900;font-size:20px;color:var(--stage);text-shadow:0 0 10px rgba(125,249,255,.9),0 2px 6px rgba(0,0,0,.7);z-index:60;animation:fu .8s ease-out forwards}
+.float-text.crit{font-size:34px;color:var(--gold);text-shadow:0 0 18px rgba(255,211,107,.95),0 2px 8px rgba(0,0,0,.8);animation:fuCrit 1s ease-out forwards}
+@keyframes fu{from{opacity:1;transform:translate(-50%,0) scale(1)}to{opacity:0;transform:translate(-50%,-82px) scale(1.25)}}
+@keyframes fuCrit{0%{opacity:0;transform:translate(-50%,10px) scale(.4)}20%{opacity:1;transform:translate(-50%,-6px) scale(1.35)}100%{opacity:0;transform:translate(-50%,-110px) scale(1)}}
+.particle{position:fixed;width:6px;height:6px;border-radius:50%;pointer-events:none;z-index:55;background:var(--stage);box-shadow:0 0 9px var(--stage);transform:translate(-50%,-50%);transition:transform .55s cubic-bezier(.2,.7,.3,1),opacity .55s ease}
+.particle.gold{background:var(--gold);box-shadow:0 0 12px var(--gold);width:8px;height:8px}
+
+.boost-info{font-size:13px;color:#9fb0d0;text-align:center;min-height:18px;letter-spacing:.3px}
+.boost-info.on{color:var(--stage);text-shadow:0 0 10px rgba(125,249,255,.5)}
+
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.actions .full{grid-column:1/-1}
+.btn{border:1px solid rgba(125,249,255,.25);border-radius:14px;padding:12px;font-size:14px;font-weight:800;color:#fff;cursor:pointer;letter-spacing:.2px;transition:transform .08s ease,box-shadow .2s ease;background:linear-gradient(180deg,rgba(125,249,255,.18),rgba(138,108,255,.18));box-shadow:0 4px 16px rgba(0,0,0,.3);-webkit-tap-highlight-color:transparent}
+.btn:active{transform:translateY(1px) scale(.99)}
+.btn.secondary{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+.btn.danger{background:linear-gradient(180deg,rgba(255,90,110,.25),rgba(160,30,50,.35));border-color:rgba(255,120,140,.35)}
+.btn.shop{background:linear-gradient(180deg,rgba(255,211,107,.22),rgba(138,108,255,.22));border-color:rgba(255,211,107,.35)}
+.btn.legacy{background:linear-gradient(180deg,rgba(255,211,107,.30),rgba(255,122,217,.26));border-color:var(--gold)}
+.btn.social{background:linear-gradient(180deg,rgba(103,247,178,.22),rgba(125,249,255,.18));border-color:rgba(103,247,178,.35)}
+.btn.collect{background:linear-gradient(180deg,rgba(103,247,178,.26),rgba(125,249,255,.2));border-color:rgba(103,247,178,.4)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ready{box-shadow:0 0 22px rgba(255,211,107,.45);animation:readyPulse 1.6s ease-in-out infinite}
+.btn.active-boost{background:linear-gradient(180deg,rgba(125,249,255,.42),rgba(60,200,140,.42));border-color:var(--stage);box-shadow:0 0 24px rgba(125,249,255,.42)}
+@keyframes readyPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+
+.daily-btn{display:flex;align-items:center;gap:10px;text-align:left;padding:11px 14px;position:relative;background:linear-gradient(180deg,rgba(255,211,107,.16),rgba(138,108,255,.16));border-color:rgba(255,211,107,.3);overflow:hidden}
+.daily-btn .daily-ico{flex:0 0 auto;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--gold);filter:drop-shadow(0 0 6px rgba(255,211,107,.5))}
+.daily-btn .daily-ico svg{width:26px;height:26px}
+.daily-btn .daily-txt{display:flex;flex-direction:column;min-width:0;flex:1}
+.daily-btn .daily-label{font-size:14px;font-weight:900;letter-spacing:.3px}
+.daily-btn .daily-status{font-size:11px;font-weight:700;color:#cdd8f0;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.daily-btn .daily-badge{display:none;position:absolute;top:8px;right:10px;width:10px;height:10px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold);animation:badgePulse 1.2s ease-in-out infinite}
+.daily-btn.ready{border-color:var(--gold);box-shadow:0 0 22px rgba(255,211,107,.4),0 4px 16px rgba(0,0,0,.3);background:linear-gradient(180deg,rgba(255,211,107,.34),rgba(255,140,80,.28))}
+.daily-btn.ready .daily-status{color:#fff;text-shadow:0 0 8px rgba(255,211,107,.7)}
+.daily-btn.ready .daily-badge{display:block}
+.daily-btn.shake{animation:shakeX .4s ease}
+@keyframes badgePulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.6}}
+@keyframes shakeX{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+
+.upgrades{display:grid;gap:10px}
+.upgrade{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.upgrade:last-child{border-bottom:0;padding-bottom:0}
+.upg-icon{flex:0 0 auto;width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,.11),rgba(255,255,255,.035));border:1px solid rgba(125,249,255,.23);box-shadow:inset 0 0 14px rgba(125,249,255,.06)}
+.upg-icon svg{width:27px;height:27px}
+.upg-icon.drill{color:var(--stage);filter:drop-shadow(0 0 7px rgba(125,249,255,.62))}
+.upg-icon.drone{color:var(--violet);filter:drop-shadow(0 0 7px rgba(138,108,255,.62))}
+.upg-icon.pick{color:var(--amber);filter:drop-shadow(0 0 7px rgba(255,184,107,.62))}
+.upgrade-info{min-width:0;flex:1}
+.upgrade-name{font-weight:900}
+.upgrade-desc{font-size:12px;color:#9fb0d0;margin-top:2px}
+.upgrade-ms{font-size:11px;color:var(--green);margin-top:2px}
+.buy-btn{white-space:nowrap;min-width:98px;padding:10px 12px;font-size:13px;line-height:1.25;background:linear-gradient(180deg,rgba(138,108,255,.32),rgba(60,70,150,.36))}
+.buy-btn span{color:var(--stage)}
+
+.synergy{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,.07)}
+.synergy-title{font-size:12px;color:#9fb0d0;letter-spacing:.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.synergy-title b{color:var(--green)}
+.syn-row{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;padding:3px 0}
+.syn-row .syn-name{color:#cdd8f0}
+.syn-row .syn-val{color:var(--green);font-weight:800;white-space:nowrap}
+.syn-bar{height:5px;border-radius:3px;background:rgba(255,255,255,.07);overflow:hidden;margin-top:2px}
+.syn-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--stage));border-radius:3px;transition:width .3s ease}
+
+.footer{font-size:11px;color:#6f7da0;text-align:center;line-height:1.5;margin-top:4px}
+
+.modal{position:fixed;inset:0;background:rgba(3,5,12,.86);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:110;padding:18px}
+.modal.show{display:flex}
+.modal-card{width:min(94vw,420px);max-height:90vh;overflow-y:auto;background:linear-gradient(180deg,#121a32,#0a0f1f);border:1px solid rgba(125,249,255,.3);border-radius:22px;padding:22px;text-align:center;box-shadow:0 0 48px rgba(125,249,255,.22),0 18px 50px rgba(0,0,0,.5)}
+.modal-card.wide{width:min(96vw,460px)}
+.modal-title{font-size:18px;font-weight:900;letter-spacing:.5px;margin-bottom:6px;background:linear-gradient(90deg,var(--gold),var(--stage));-webkit-background-clip:text;background-clip:text;color:transparent}
+.modal-sub{font-size:13px;color:#9fb0d0;margin-bottom:14px}
+.offline-amount{font-size:34px;font-weight:900;color:#fff;text-shadow:0 0 18px rgba(125,249,255,.6);margin:6px 0 4px}
+.offline-amount:before{content:"◆ ";color:var(--stage);text-shadow:0 0 12px var(--stage)}
+.modal-note{font-size:12px;color:#7f8db0;margin-bottom:14px;line-height:1.4}
+.modal-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.modal-actions .btn{flex:1;min-width:120px}
+.daily-claim{background:linear-gradient(180deg,rgba(255,211,107,.4),rgba(255,140,80,.34))!important;border-color:var(--gold)!important;box-shadow:0 0 20px rgba(255,211,107,.35)!important;color:#fff!important}
+.x2-btn{background:linear-gradient(180deg,rgba(103,247,178,.3),rgba(125,249,255,.24))!important;border-color:rgba(103,247,178,.5)!important}
+
+.daily-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin:4px 0 6px}
+.day-cell{position:relative;border-radius:12px;padding:8px 2px 7px;display:flex;flex-direction:column;align-items:center;gap:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);transition:transform .2s ease}
+.day-cell .dc-num{font-size:10px;color:#8fa0c8;font-weight:800}
+.day-cell .dc-val{font-size:12px;font-weight:900;color:#cdd8f0}
+.day-cell.claimed{opacity:.5}
+.day-cell.claimed .dc-val{color:#67f7b2}
+.day-cell.claimed:after{content:"✓";position:absolute;top:3px;right:5px;font-size:10px;color:#67f7b2}
+.day-cell.future{opacity:.4}
+.day-cell.current{border-color:var(--gold);background:linear-gradient(180deg,rgba(255,211,107,.22),rgba(255,140,80,.14));box-shadow:0 0 16px rgba(255,211,107,.35);animation:cellPulse 1.6s ease-in-out infinite;transform:translateY(-2px)}
+.day-cell.current .dc-val{color:#fff;text-shadow:0 0 8px rgba(255,211,107,.7)}
+.day-cell.current:after{content:"сегодня";position:absolute;bottom:-7px;left:50%;transform:translateX(-50%);font-size:8px;letter-spacing:.5px;color:var(--gold);background:#0a0f1f;padding:0 4px;border-radius:6px;border:1px solid rgba(255,211,107,.4);white-space:nowrap}
+.day-cell.big .dc-val{color:var(--gold)}
+@keyframes cellPulse{0%,100%{box-shadow:0 0 12px rgba(255,211,107,.3)}50%{box-shadow:0 0 24px rgba(255,211,107,.6)}}
+.daily-bonus{display:none;font-size:12px;color:var(--gold);margin-top:8px;line-height:1.4;background:rgba(255,211,107,.1);border:1px solid rgba(255,211,107,.3);border-radius:12px;padding:8px 10px}
+.daily-bonus.show{display:block}
+
+.shop-section-title{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:#8fa0c8;margin:14px 0 8px;text-align:left}
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.shop-card{background:linear-gradient(180deg,rgba(255,255,255,.06),rgba(255,255,255,.02));border:1px solid rgba(125,249,255,.2);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px;text-align:center}
+.shop-card.owned{border-color:rgba(103,247,178,.4)}
+.shop-card.active{border-color:var(--gold);box-shadow:0 0 16px rgba(255,211,107,.3)}
+.skin-preview{width:64px;height:64px;border-radius:50%;margin:0 auto;border:2px solid rgba(255,255,255,.25)}
+.skin-preview.sp-std{background:radial-gradient(circle at 32% 28%,#7484df,#3a3f86 40%,#1c1d44 72%,#0c0d22)}
+.skin-preview.sp-ice{background:radial-gradient(circle at 32% 28%,#dff6ff,#7fc8ef 38%,#2b6f9e 72%,#0c2740);border-color:rgba(160,230,255,.6)}
+.skin-preview.sp-lava{background:radial-gradient(circle at 32% 28%,#ffd9a0,#ff7a3c 36%,#a8281a 70%,#2a0806);border-color:rgba(255,140,80,.6)}
+.skin-preview.sp-emerald{background:radial-gradient(circle at 32% 28%,#d6ffe9,#46d99a 38%,#157a52 72%,#06281c);border-color:rgba(120,255,190,.6)}
+.skin-preview.sp-void{background:radial-gradient(circle at 32% 28%,#b39cff,#5a2fa8 40%,#1c0a3e 74%,#05010c);border-color:rgba(180,140,255,.6)}
+.shop-name{font-size:13px;font-weight:900}
+.shop-desc{font-size:11px;color:#9fb0d0;line-height:1.35;min-height:30px}
+.shop-price{font-size:13px;font-weight:900;color:var(--stage)}
+.shop-price:before{content:"◆ "}
+.shop-buy{padding:9px 10px;font-size:12px;border-radius:11px}
+.shop-buy.owned-btn{background:rgba(103,247,178,.16);border-color:rgba(103,247,178,.4);color:#9dffd0;cursor:default}
+.shop-buy.active-btn{background:linear-gradient(180deg,rgba(255,211,107,.3),rgba(255,140,80,.25));border-color:var(--gold);color:#fff}
+.spin-row{display:flex;align-items:center;gap:10px;justify-content:center;margin-top:6px}
+.spin-result{font-size:12px;color:var(--gold);min-height:16px;margin-top:6px}
+.shop-note{font-size:11px;color:#6f7da0;margin-top:12px;line-height:1.4;text-align:left;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:10px}
+
+.legacy-info{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 14px}
+.li-cell{background:rgba(255,255,255,.04);border:1px solid rgba(255,211,107,.2);border-radius:14px;padding:10px}
+.li-cell .li-label{font-size:10px;color:#9fb0d0;letter-spacing:.4px}
+.li-cell .li-val{font-size:18px;font-weight:900;margin-top:3px;color:#fff}
+.li-cell .li-val.gold{color:var(--gold);text-shadow:0 0 10px rgba(255,211,107,.5)}
+.li-cell .li-val.stage{color:var(--stage)}
+
+.friends-list{display:grid;gap:10px;margin-top:8px;text-align:left}
+.friend-card{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border:1px solid rgba(125,249,255,.18);border-radius:16px;padding:10px}
+.avatar{width:42px;height:42px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-weight:900;color:#08101f;box-shadow:0 0 14px rgba(125,249,255,.25)}
+.friend-info{min-width:0;flex:1}
+.friend-name{font-weight:900;font-size:14px}
+.friend-loot{font-size:11px;color:#9fb0d0;margin-top:2px}
+.friend-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;min-width:130px}
+.mini-btn{padding:8px 9px;font-size:11px;border-radius:10px;min-width:auto}
+
+.toast{position:fixed;left:50%;top:12px;transform:translateX(-50%) translateY(-16px);z-index:300;background:linear-gradient(180deg,rgba(18,26,50,.96),rgba(10,15,31,.96));border:1px solid rgba(125,249,255,.35);color:#eaf0ff;padding:10px 14px;border-radius:14px;font-size:13px;font-weight:800;box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 20px rgba(125,249,255,.18);opacity:0;pointer-events:none;transition:opacity .22s ease,transform .22s ease;max-width:92vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.good{border-color:rgba(103,247,178,.5);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 20px rgba(103,247,178,.2)}
+.toast.bad{border-color:rgba(255,107,125,.5);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 20px rgba(255,107,125,.2)}
+.toast.gold{border-color:rgba(255,211,107,.6);box-shadow:0 10px 30px rgba(0,0,0,.45),0 0 24px rgba(255,211,107,.25)}
+
+body.legacy-flash .app{animation:legacyFlash .9s ease}
+@keyframes legacyFlash{0%{filter:brightness(1)}18%{filter:brightness(2.4) saturate(1.6) contrast(1.1)}45%{filter:brightness(1.35) saturate(1.2)}100%{filter:brightness(1)}}
+</style>
 </head>
-<body>
-  <div id="app">
-    <header>
-      <h1>Космическая шахта</h1>
-      <div class="sub">Небесное тело: <span id="skinName">Рудный астероид</span></div>
-      <div class="stats">
-        <div class="stat"><small>Кристаллы</small><b id="crystals">0</b></div>
-        <div class="stat"><small>В секунду</small><b id="cps">0</b></div>
-        <div class="stat"><small>Осколки звёзд</small><b id="shards">0</b></div>
-        <div class="stat"><small>Вечный множитель</small><b id="eternal">x1.00</b></div>
-      </div>
-    </header>
+<body data-tier="0">
+<div class="space-bg">
+  <div class="stars s1"></div><div class="stars s2"></div><div class="stars s3"></div>
+  <div class="nebula n1"></div><div class="nebula n2"></div><div class="nebula n3"></div>
+  <div class="meteor m1"></div><div class="meteor m2"></div><div class="meteor m3"></div>
+  <div class="planet p1"><span class="ring"></span></div>
+  <div class="planet p2"></div>
+  <div class="ship"><span class="hull"></span><span class="cockpit"></span><span class="engine"></span></div>
 
-    <section class="mine">
-      <div id="combo">COMBO x1.0</div>
-      <div class="asteroid-wrap">
-        <button id="asteroid" class="asteroid" aria-label="Добыть"></button>
-      </div>
-      <div id="clickInfo">+1 за клик · Крит: 5% шанс · x10</div>
-      <div id="boostStatus">Буст не активен</div>
-      <div class="actions">
-        <button id="btnBoost" class="btn primary ad-btn">▶ Буст x2 · 30с</button>
-        <button id="btnCollect" class="btn primary ad-btn">⚡ Собрать 60с</button>
-        <button id="btnDaily" class="btn good">Ежедневная награда</button>
-        <button id="btnSkins" class="btn">🛒 Скины</button>
-        <button id="btnHeritage" class="btn">⚛ Наследие</button>
-        <button id="btnFriends" class="btn">👥 Друзья</button>
-        <button id="btnShare" class="btn ad-btn">📣 Позвать друга</button>
-        <button id="btnSave" class="btn">Сохранить</button>
-        <button id="btnReset" class="btn danger">Сброс</button>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Улучшения</h2>
-      <div id="upgrades"></div>
-      <h3>Синергия оборудования</h3>
-      <div id="synergyText"></div>
-    </section>
+  <div class="tier-layer tier-0">
+    <div class="ground"></div><div class="pebble p1"></div><div class="pebble p2"></div><div class="pebble p3"></div>
+  </div>
+  <div class="tier-layer tier-1">
+    <div class="belt"></div><div class="rock r1"></div><div class="rock r2"></div><div class="rock r3"></div>
+  </div>
+  <div class="tier-layer tier-2">
+    <div class="atmo"></div><div class="orbitRing"></div><div class="moon"></div>
+  </div>
+  <div class="tier-layer tier-3">
+    <div class="coronaBg"></div><div class="flare"></div>
   </div>
 
-  <div id="overlay" class="overlay hidden">
-    <div class="modal">
-      <div id="modalBody"></div>
-      <div class="modal-actions"><button class="btn" data-action="close">Закрыть</button></div>
+  <div class="vignette"></div>
+</div>
+
+<div class="app" id="app">
+  <div class="header">
+    <h1>Космическая шахта</h1>
+    <div class="tier-line" id="tierLine">Небесное тело: Камень</div>
+    <div class="subtitle">Наследие · соц. модуль · космический idle</div>
+    <button class="sound-btn" id="soundBtn" aria-label="Звук">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 9v6h4l5 4V5L8 9H4z"/><path class="wave" d="M16 9a4 4 0 0 1 0 6"/><path class="wave" d="M18.5 7a7 7 0 0 1 0 10"/><path class="slash" d="M3 3l18 18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-label">Кристаллы</div><div class="stat-value" id="crystals">0</div></div>
+    <div class="stat"><div class="stat-label">В секунду</div><div class="stat-value" id="perSecond">0</div></div>
+    <div class="stat"><div class="stat-label">Осколки звёзд</div><div class="stat-value" id="shards">0</div></div>
+    <div class="stat"><div class="stat-label">Вечный множитель</div><div class="stat-value" id="legacyMult">x1.00</div></div>
+  </div>
+
+  <div class="mine-wrap">
+    <div class="halo"></div>
+    <div class="corona"></div>
+    <div class="combo" id="combo">COMBO x2</div>
+    <div class="orbit orbit-debris"><span class="shard s1"></span><span class="shard s2"></span><span class="shard s3"></span><span class="shard s4"></span></div>
+    <div class="orbit orbit-crystals"><span class="crystal k1"></span><span class="crystal k2"></span><span class="crystal k3"></span></div>
+    <div class="orbit orbit-drones"><span class="mini-drone d1"></span><span class="mini-drone d2"></span><span class="mini-drone d3"></span></div>
+    <div class="orbit orbit-drills"><span class="mini-drill r1"></span><span class="mini-drill r2"></span><span class="mini-drill r3"></span></div>
+    <button class="mine-btn" id="mineBtn">
+      <span class="crater c1"></span><span class="crater c2"></span><span class="crater c3"></span><span class="crater c4"></span><span class="crater c5"></span>
+      <span class="vein v1"></span><span class="vein v2"></span><span class="vein v3"></span>
+      <span class="mine-label">Добыть<br>+<span id="tapPower">1</span></span>
+    </button>
+  </div>
+
+  <div class="boost-info" id="boostInfo">Крит: 5% шанс · x10</div>
+
+  <div class="actions">
+    <button class="btn daily-btn full" id="dailyBtn">
+      <span class="daily-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v8a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/><path d="M12 7S10 2 7.5 3.5 9 7 12 7z"/><path d="M12 7s2-5 4.5-3.5S15 7 12 7z"/></svg></span>
+      <span class="daily-txt"><span class="daily-label">Ежедневная награда</span><span class="daily-status" id="dailyStatus"></span></span>
+      <span class="daily-badge" id="dailyBadge"></span>
+    </button>
+
+    <button class="btn shop" id="shopBtn">🛒 Скины</button>
+    <button class="btn legacy" id="legacyBtn">⚛ Наследие</button>
+    <button class="btn" id="adBtn">▶ Буст x2 · 30с</button>
+    <button class="btn collect" id="collectBtn">⚡ Собрать 60с</button>
+    <button class="btn social full" id="socialBtn">👥 Друзья / кража / помощь</button>
+    <button class="btn secondary" id="saveBtn">Сохранить</button>
+    <button class="btn danger" id="resetBtn">Сброс</button>
+  </div>
+
+  <div class="panel">
+    <div class="upgrade-name" style="margin-bottom:6px">Улучшения</div>
+    <div class="upgrades">
+      <div class="upgrade">
+        <div class="upg-icon drill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3h4v4h-4z"/><path d="M11 7l-1 9 2 4 2-4-1-9"/><path d="M9.5 10h5M9.8 13h4.4M10.3 16h3.4"/></svg></div>
+        <div class="upgrade-info"><div class="upgrade-name">Бур <span id="drillCount">0</span></div><div class="upgrade-desc">+1 кристалл/сек</div><div class="upgrade-ms" id="drillMs"></div></div>
+        <button class="btn buy-btn" id="buyDrill">Купить<br><span id="drillCost">15</span></button>
+      </div>
+      <div class="upgrade">
+        <div class="upg-icon drone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 10L6 6M14 10l4-4M10 14l-4 4M14 14l4 4"/><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="18" r="2.2"/><circle cx="12" cy="12" r="3.2"/></svg></div>
+        <div class="upgrade-info"><div class="upgrade-name">Дрон <span id="droneCount">0</span></div><div class="upgrade-desc">+5 кристаллов/сек</div><div class="upgrade-ms" id="droneMs"></div></div>
+        <button class="btn buy-btn" id="buyDrone">Купить<br><span id="droneCost">100</span></button>
+      </div>
+      <div class="upgrade">
+        <div class="upg-icon pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8c5-4 11-4 16 0"/><path d="M4 8l2.5 2M20 8l-2.5 2"/><path d="M12 8v11"/><path d="M10 19h4"/></svg></div>
+        <div class="upgrade-info"><div class="upgrade-name">Кирка <span id="pickCount">0</span></div><div class="upgrade-desc">+1 за клик</div><div class="upgrade-ms" id="pickMs"></div></div>
+        <button class="btn buy-btn" id="buyPick">Купить<br><span id="pickCost">25</span></button>
+      </div>
+    </div>
+    <div class="synergy">
+      <div class="synergy-title">⚡ Синергия оборудования <b id="synTotal">+0%</b></div>
+      <div class="syn-row"><span class="syn-name">Буры → доход</span><span class="syn-val" id="synDrill">+0%</span></div>
+      <div class="syn-bar"><i id="synDrillBar" style="width:0%"></i></div>
+      <div class="syn-row"><span class="syn-name">Дроны → доход</span><span class="syn-val" id="synDrone">+0%</span></div>
+      <div class="syn-bar"><i id="synDroneBar" style="width:0%"></i></div>
+      <div class="syn-row"><span class="syn-name">Кирки → тап</span><span class="syn-val" id="synPick">+0%</span></div>
+      <div class="syn-bar"><i id="synPickBar" style="width:0%"></i></div>
     </div>
   </div>
 
-  <div id="toasts"></div>
-  <div id="fx"></div>
+  <div class="footer">Космическая шахта · idle-кликер · прогресс сохраняется автоматически.</div>
+</div>
 
-  <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/vk-bridge.umd.js"></script>
-  <script src="platform.js"></script>
+<div class="modal" id="offlineModal"><div class="modal-card">
+  <div class="modal-title">С возвращением, командир!</div>
+  <div class="modal-sub">Пока ты отсутствовал, оборудование добыло:</div>
+  <div class="offline-amount" id="offlineAmount">0</div>
+  <div class="modal-note" id="offlineNote"></div>
+  <div class="modal-actions">
+    <button class="btn secondary" id="offlineTake">Забрать</button>
+    <button class="btn x2-btn" id="offlineX2">▶ Удвоить за рекламу</button>
+  </div>
+</div></div>
 
-  <script>
-    const SAVE_KEY = 'spaceMineVkLegacy_v1';
-    const PRESTIGE_THRESHOLD = 1_000_000;
-    const OFFLINE_CAP_SECONDS = 8 * 60 * 60;
-    const INTERSTITIAL_COOLDOWN = 3 * 60 * 1000;
-    const SESSION_BEFORE_INTERSTITIAL = 2 * 60 * 1000;
+<div class="modal" id="dailyModal"><div class="modal-card wide">
+  <div class="modal-title">Ежедневная награда</div>
+  <div class="modal-sub" id="dailySub">День 1 из 7</div>
+  <div class="daily-grid" id="dailyGrid"></div>
+  <div class="daily-bonus" id="dailyBonus"></div>
+  <div class="modal-actions">
+    <button class="btn secondary" id="dailyClose">Закрыть</button>
+    <button class="btn daily-claim" id="dailyClaim">Забрать</button>
+    <button class="btn x2-btn" id="dailyX2">▶ Забрать x2</button>
+  </div>
+</div></div>
 
-    const SKINS = [
-      { id: 0, name: 'Рудный астероид', cost: 0,         color: '#22d3ee', color2: '#4c1d95', glow: 'rgba(34,211,238,0.55)' },
-      { id: 1, name: 'Лёд',             cost: 5_000,     color: '#7dd3fc', color2: '#1e3a8a', glow: 'rgba(125,211,252,0.55)' },
-      { id: 2, name: 'Обсидиан',        cost: 50_000,    color: '#a78bfa', color2: '#1e1b4b', glow: 'rgba(167,139,250,0.55)' },
-      { id: 3, name: 'Плазма',          cost: 250_000,   color: '#f472b6', color2: '#7c3aed', glow: 'rgba(244,114,182,0.55)' },
-      { id: 4, name: 'Нейтрон',         cost: 1_000_000, color: '#67e8f9', color2: '#0ea5e9', glow: 'rgba(103,232,249,0.6)'  },
-      { id: 5, name: 'Квант',           cost: 5_000_000, color: '#fde047', color2: '#db2777', glow: 'rgba(253,224,71,0.6)'   }
-    ];
+<div class="modal" id="shopModal"><div class="modal-card wide">
+  <div class="modal-title">Гараж скинов</div>
+  <div class="modal-sub">Скины за кристаллы · крутка за рекламу</div>
+  <div class="shop-grid" id="skinsGrid"></div>
+  <div class="spin-row"><button class="btn x2-btn" id="spinBtn">▶ Крутка скина за рекламу</button></div>
+  <div class="spin-result" id="spinResult"></div>
+  <div class="shop-note">Скины открываются за кристаллы или рекламную крутку. Сила — в игре: улучшения, синергия, наследие.</div>
+  <div class="modal-actions"><button class="btn secondary" id="shopClose">Закрыть</button></div>
+</div></div>
 
-    const UPGRADES = {
-      drill:   { name: 'Бур',   desc: '+1 кристалл/сек',   base: 15,  growth: 1.15 },
-      drone:   { name: 'Дрон',  desc: '+5 кристаллов/сек', base: 100, growth: 1.15 },
-      pickaxe: { name: 'Кирка', desc: '+1 за клик',        base: 25,  growth: 1.15 }
-    };
+<div class="modal" id="legacyModal"><div class="modal-card wide">
+  <div class="modal-title">⚛ Наследие</div>
+  <div class="modal-sub">Пересобери корабль. Прогресс сбросится, но ты получишь вечные Осколки звёзд.</div>
+  <div class="legacy-info">
+    <div class="li-cell"><div class="li-label">Осколки сейчас</div><div class="li-val gold" id="legShards">0</div></div>
+    <div class="li-cell"><div class="li-label">Вечный множитель</div><div class="li-val gold" id="legMult">x1.00</div></div>
+    <div class="li-cell"><div class="li-label">Получишь при сбросе</div><div class="li-val gold" id="legGain">+0</div></div>
+    <div class="li-cell"><div class="li-label">Следующий объект</div><div class="li-val stage" id="legNext">Астероид</div></div>
+  </div>
+  <div class="modal-note" id="legReq"></div>
+  <button class="btn legacy" id="doLegacy" style="width:100%">Пересобрать корабль</button>
+  <div class="modal-actions"><button class="btn secondary" id="legacyClose">Закрыть</button></div>
+</div></div>
 
-    const FRIEND_NAMES = ['Орион', 'Вега', 'Сириус', 'Альтаир', 'Денеб', 'Полярис', 'Кассиопея', 'Ригель'];
+<div class="modal" id="socialModal"><div class="modal-card wide">
+  <div class="modal-title">👥 Социальный модуль</div>
+  <div class="modal-sub">Помогай друзьям, кради ресурсы и зови новых игроков.</div>
+  <div class="modal-note" id="socialInfo"></div>
+  <div class="friends-list" id="friendsList"></div>
+  <div class="modal-actions">
+    <button class="btn x2-btn" id="shareBtn">📣 Поделиться / позвать друга</button>
+    <button class="btn secondary" id="socialClose">Закрыть</button>
+  </div>
+</div></div>
 
-    const dom = {
-      crystals: document.getElementById('crystals'),
-      cps: document.getElementById('cps'),
-      shards: document.getElementById('shards'),
-      eternal: document.getElementById('eternal'),
-      skinName: document.getElementById('skinName'),
-      combo: document.getElementById('combo'),
-      asteroid: document.getElementById('asteroid'),
-      clickInfo: document.getElementById('clickInfo'),
-      boostStatus: document.getElementById('boostStatus'),
-      upgrades: document.getElementById('upgrades'),
-      synergyText: document.getElementById('synergyText'),
-      overlay: document.getElementById('overlay'),
-      modalBody: document.getElementById('modalBody'),
-      toasts: document.getElementById('toasts'),
-      fx: document.getElementById('fx'),
-      btnBoost: document.getElementById('btnBoost'),
-      btnCollect: document.getElementById('btnCollect'),
-      btnDaily: document.getElementById('btnDaily'),
-      btnSkins: document.getElementById('btnSkins'),
-      btnHeritage: document.getElementById('btnHeritage'),
-      btnFriends: document.getElementById('btnFriends'),
-      btnShare: document.getElementById('btnShare'),
-      btnSave: document.getElementById('btnSave'),
-      btnReset: document.getElementById('btnReset')
-    };
+<div class="toast" id="toast"></div>
 
-    let state = loadState();
-    let myId = '';
-    let adPending = false;
-    let pendingOffline = 0;
-    let sessionStart = Date.now();
-    let lastInterstitial = 0;
-    let lastTick = performance.now();
-
-    function defaultState() {
-      return {
-        crystals: 0, runCrystals: 0, lifetimeCrystals: 0, shards: 0,
-        drill: 0, drone: 0, pickaxe: 0, boostUntil: 0, comboCount: 0, comboExpire: 0,
-        skin: 0, ownedSkins: [0], lastSeen: Date.now(), lastDailyDay: -1, dailyStreak: 0,
-        inviteClaimed: false, invitedBy: '', friends: [], version: 1
-      };
-    }
-
-    function loadState() {
-      const saved = Platform.storageGet(SAVE_KEY, null);
-      const merged = Object.assign(defaultState(), saved || {});
-      if (!Array.isArray(merged.ownedSkins) || merged.ownedSkins.length === 0) merged.ownedSkins = [0];
-      if (!Array.isArray(merged.friends)) merged.friends = [];
-      return merged;
-    }
-
-    function saveState() { state.lastSeen = Date.now(); Platform.storageSet(SAVE_KEY, state); }
-    function resetState() { state = defaultState(); saveState(); renderUpgrades(); updateUI(); toast('Прогресс сброшен'); }
-
-    function fmt(number) {
-      const n = Number(number || 0);
-      if (!Number.isFinite(n)) return '0';
-      if (n < 1000) return Math.floor(n).toString();
-      const units = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp'];
-      const unitIndex = Math.min(Math.floor(Math.log10(Math.abs(n)) / 3), units.length - 1);
-      const value = n / Math.pow(1000, unitIndex);
-      return value.toFixed(value >= 100 ? 0 : value >= 10 ? 1 : 2) + units[unitIndex];
-    }
-
-    function currentSkin() { return SKINS.find(s => s.id === state.skin) || SKINS[0]; }
-    function eternalMultiplier() { return 1 + state.shards * 0.02; }
-    function boostActive() { return Date.now() < state.boostUntil; }
-    function comboMultiplier() { return 1 + Math.min(state.comboCount, 10) * 0.1; }
-
-    function synergy() {
-      const drillBonus = state.drill * 0.001;
-      const droneBonus = state.drone * 0.0015;
-      const pickBonus = state.pickaxe * 0.001;
-      return {
-        incomeDrill: drillBonus, incomeDrone: droneBonus, tapPick: pickBonus,
-        incomeTotal: 1 + drillBonus + droneBonus, tapTotal: 1 + pickBonus + drillBonus * 0.5
-      };
-    }
-
-    function getCps() {
-      const base = state.drill * 1 + state.drone * 5;
-      const syn = synergy();
-      const boost = boostActive() ? 2 : 1;
-      return base * syn.incomeTotal * eternalMultiplier() * boost;
-    }
-
-    function getClickValue() {
-      const base = 1 + state.pickaxe;
-      const syn = synergy();
-      const boost = boostActive() ? 2 : 1;
-      return base * syn.tapTotal * eternalMultiplier() * comboMultiplier() * boost;
-    }
-
-    function getCost(type) {
-      const item = UPGRADES[type];
-      const count = state[type] || 0;
-      return Math.floor(item.base * Math.pow(item.growth, count));
-    }
-
-    function addCrystals(amount, countAsProgress = true) {
-      const value = Number(amount || 0);
-      if (!Number.isFinite(value) || value <= 0) return;
-      state.crystals += value;
-      if (countAsProgress) { state.runCrystals += value; state.lifetimeCrystals += value; }
-    }
-
-    function toast(message) {
-      const el = document.createElement('div');
-      el.className = 'toast'; el.textContent = message; dom.toasts.appendChild(el);
-      setTimeout(() => el.remove(), 2500);
-    }
-
-    function spawnFloat(text, x, y, isCrit = false) {
-      const el = document.createElement('div');
-      el.className = 'float' + (isCrit ? ' crit' : ''); el.textContent = text;
-      el.style.left = `${x}px`; el.style.top = `${y}px`; dom.fx.appendChild(el);
-      setTimeout(() => el.remove(), 900);
-    }
-
-    function buildStars() {
-      const wrap = document.createElement('div');
-      wrap.id = 'stars';
-      document.body.insertBefore(wrap, document.body.firstChild);
-      for (let i = 0; i < 60; i++) {
-        const s = document.createElement('i');
-        s.style.left = Math.random() * 100 + 'vw';
-        s.style.top = Math.random() * 100 + 'vh';
-        s.style.animationDelay = (Math.random() * 3) + 's';
-        s.style.transform = 'scale(' + (0.6 + Math.random() * 1.4) + ')';
-        wrap.appendChild(s);
-      }
-    }
-
-    function spawnSparks(x, y, color, big) {
-      const n = big ? 12 : 7;
-      for (let i = 0; i < n; i++) {
-        const el = document.createElement('div');
-        el.className = 'spark';
-        const ang = Math.random() * Math.PI * 2;
-        const dist = (big ? 70 : 45) + Math.random() * 40;
-        el.style.left = x + 'px'; el.style.top = y + 'px';
-        el.style.color = color; el.style.background = color;
-        el.style.setProperty('--dx', Math.cos(ang) * dist + 'px');
-        el.style.setProperty('--dy', Math.sin(ang) * dist + 'px');
-        dom.fx.appendChild(el);
-        setTimeout(() => el.remove(), 600);
-      }
-    }
-
-    function openModal(html) { dom.modalBody.innerHTML = html; dom.overlay.classList.remove('hidden'); }
-    function closeModal() { dom.overlay.classList.add('hidden'); dom.modalBody.innerHTML = ''; }
-    function isModalOpen() { return !dom.overlay.classList.contains('hidden'); }
-    function setAdButtons(disabled) { document.querySelectorAll('.ad-btn').forEach(btn => { btn.disabled = Boolean(disabled); }); }
-
-    async function withRewarded(successMessage, rewardFunction) {
-      if (adPending) return;
-      adPending = true; setAdButtons(true);
-      const success = await Platform.showRewardedAd();
-      adPending = false; setAdButtons(false);
-      if (success) { rewardFunction(); toast(successMessage); saveState(); updateUI(); }
-      else { toast('Реклама недоступна. Открой игру внутри VK.'); }
-    }
-
-    async function maybeInterstitial(force = false) {
-      if (!Platform.vk || adPending || isModalOpen()) return;
-      const now = Date.now();
-      const sessionOk = now - sessionStart > SESSION_BEFORE_INTERSTITIAL;
-      const cooldownOk = now - lastInterstitial > INTERSTITIAL_COOLDOWN;
-      if (!force && (!sessionOk || !cooldownOk)) return;
-      if (force && now - lastInterstitial < 60_000) return;
-      lastInterstitial = now;
-      await Platform.showInterstitialAd();
-    }
-
-    function renderUpgrades() {
-      dom.upgrades.innerHTML = Object.entries(UPGRADES).map(([key, item]) => {
-        const count = state[key] || 0;
-        const cost = getCost(key);
-        const disabled = state.crystals < cost ? 'disabled' : '';
-        return `
-          <div class="upgrade">
-            <div>
-              <b>${item.name} <span class="muted">${count}</span></b>
-              <div class="muted">${item.desc}</div>
-            </div>
-            <button class="buy-btn" data-buy="${key}" ${disabled}>Купить ${fmt(cost)}</button>
-          </div>`;
-      }).join('');
-    }
-
-    function refreshUpgradeButtons() {
-      document.querySelectorAll('[data-buy]').forEach(btn => {
-        const key = btn.dataset.buy;
-        const cost = getCost(key);
-        btn.textContent = `Купить ${fmt(cost)}`;
-        btn.disabled = state.crystals < cost;
-      });
-    }
-
-    function updateUI() {
-      dom.crystals.textContent = fmt(state.crystals);
-      dom.cps.textContent = fmt(getCps());
-      dom.shards.textContent = fmt(state.shards);
-      dom.eternal.textContent = `x${eternalMultiplier().toFixed(2)}`;
-
-      const skin = currentSkin();
-      dom.skinName.textContent = skin.name;
-      document.documentElement.style.setProperty('--skin', skin.color);
-      document.documentElement.style.setProperty('--skin2', skin.color2 || skin.color);
-      document.documentElement.style.setProperty('--skin-glow', skin.glow || 'rgba(34,211,238,0.5)');
-
-      dom.combo.textContent = `COMBO x${comboMultiplier().toFixed(1)}`;
-      const clickValue = getClickValue();
-      dom.clickInfo.textContent = `+${fmt(clickValue)} за клик · Крит: 5% шанс · x10`;
-
-      if (boostActive()) {
-        const left = Math.max(0, Math.ceil((state.boostUntil - Date.now()) / 1000));
-        dom.boostStatus.textContent = `Буст x2 активен: ${left} сек`;
-      } else {
-        dom.boostStatus.textContent = 'Буст не активен';
-      }
-
-      const syn = synergy();
-      dom.synergyText.innerHTML = `
-        Буры → доход +${(syn.incomeDrill * 100).toFixed(1)}%<br>
-        Дроны → доход +${(syn.incomeDrone * 100).toFixed(1)}%<br>
-        Кирки → тап +${(syn.tapPick * 100).toFixed(1)}%`;
-
-      refreshUpgradeButtons();
-    }
-
-    function buyUpgrade(type) {
-      const cost = getCost(type);
-      if (state.crystals < cost) { toast('Недостаточно кристаллов'); return; }
-      state.crystals -= cost;
-      state[type] = (state[type] || 0) + 1;
-      saveState(); renderUpgrades(); updateUI();
-    }
-
-    function mineClick(event) {
-      const now = Date.now();
-      if (now - state.comboExpire < 1500) { state.comboCount = Math.min(state.comboCount + 1, 10); }
-      else { state.comboCount = 1; }
-      state.comboExpire = now + 1500;
-
-      let value = getClickValue();
-      const isCrit = Math.random() < 0.05;
-      if (isCrit) value *= 10;
-      addCrystals(value);
-
-      const x = event.clientX || window.innerWidth / 2;
-      const y = event.clientY || window.innerHeight / 2;
-      spawnFloat(`${isCrit ? 'КРИТ ' : '+'}${fmt(value)}`, x, y, isCrit);
-      spawnSparks(x, y, isCrit ? '#fde047' : (currentSkin().color || '#22d3ee'), isCrit);
-      if (isCrit) {
-        dom.asteroid.classList.add('crit-flash');
-        setTimeout(() => dom.asteroid.classList.remove('crit-flash'), 220);
-      }
-
-      dom.asteroid.classList.remove('pulse');
-      void dom.asteroid.offsetWidth;
-      dom.asteroid.classList.add('pulse');
-      updateUI();
-    }
-
-    function activateBoost() { state.boostUntil = Date.now() + 30_000; }
-    function collectForSeconds(seconds) { const gain = getCps() * seconds; addCrystals(gain); return gain; }
-    function todayIndex() { return Math.floor(Date.now() / 86_400_000); }
-    function canClaimDaily() { return state.lastDailyDay !== todayIndex(); }
-    function dailyRewardBase(nextStreak = state.dailyStreak + 1) { return Math.floor(100 * Math.max(1, nextStreak) * eternalMultiplier()); }
-
-    function claimDaily(multiplier = 1) {
-      if (!canClaimDaily()) { toast('Ежедневная награда уже получена сегодня'); return; }
-      const prevDay = todayIndex() - 1;
-      state.dailyStreak = state.lastDailyDay === prevDay ? state.dailyStreak + 1 : 1;
-      state.lastDailyDay = todayIndex();
-      const reward = Math.floor(dailyRewardBase(state.dailyStreak) * multiplier);
-      addCrystals(reward);
-      saveState(); updateUI(); closeModal();
-      toast(`Ежедневная награда: +${fmt(reward)}`);
-      setTimeout(() => maybeInterstitial(false), 5000);
-    }
-
-    function openDailyModal() {
-      if (!canClaimDaily()) {
-        openModal(`<h2>Ежедневная награда</h2><p>Ты уже забрал награду сегодня. Возвращайся завтра.</p><p class="muted">Серия: ${state.dailyStreak} дней</p>`);
+<script>
+/* ===== VK-адаптер (реальный VK Bridge, без симуляции) ===== */
+(function(global){
+'use strict';
+var bridge = global.vkBridge || global.VKBridge || null;
+function isVK(){
+  try{
+    if(bridge) return true;
+    var ua = navigator.userAgent || '';
+    if(/VKWebApp|VKApp|VKMobile|VKPlay|vkplay/i.test(ua)) return true;
+    if(/(^|\.)vk\.com$/i.test(location.hostname)) return true;
+    var p = new URLSearchParams(location.search);
+    if(p.has('vk_app_id') || p.has('vk_ref')) return true;
+  }catch(e){}
+  return false;
+}
+var env = isVK() ? 'vk' : 'local';
+function ok(m,d,w){return{ok:true,mode:m,data:(d==null?null:d),warning:w||''}}
+function fail(m,e){return{ok:false,mode:m,error:String(e||'unknown')}}
+function P(v){try{return v&&typeof v.then==='function'?v:Promise.resolve(v)}catch(e){return Promise.resolve(fail('promise',e))}}
+function send(method,params){
+  if(!bridge || typeof bridge.send!=='function') return Promise.reject(new Error('vk_bridge_missing'));
+  try{ return P(bridge.send(method, params||{})); }catch(e){ return Promise.reject(e); }
+}
+function trySend(methods,params){
+  return methods.reduce(function(chain,method){
+    return chain.catch(function(){ return send(method,params); });
+  }, Promise.reject(new Error('no_method')));
+}
+function copyUrl(url){
+  try{ if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(url).catch(function(){}); return ok('copied'); } }catch(e){}
+  return fail('share','unavailable');
+}
+function fallbackShare(url,title,text){
+  return new Promise(function(resolve){
+    try{
+      if(global.navigator && navigator.share){
+        navigator.share({title:title,text:text,url:url}).then(function(){resolve(ok('web'))}).catch(function(){resolve(copyUrl(url))});
         return;
       }
-      const reward = dailyRewardBase(state.dailyStreak + 1);
-      openModal(`
-        <h2>Ежедневная награда</h2>
-        <p>День ${Math.min(state.dailyStreak + 1, 7)} из 7</p>
-        <p><b>Награда:</b> ${fmt(reward)} кристаллов</p>
-        <div class="modal-actions">
-          <button class="btn good" data-action="dailyClaim">Забрать</button>
-          <button class="btn primary ad-btn" data-action="dailyDouble">Забрать x2 за рекламу</button>
-        </div>`);
+    }catch(e){}
+    resolve(copyUrl(url));
+  });
+}
+var Platform={
+  env:env, adapter:env, target:'vk', mode:'boot',
+  info:function(){return{env:env,adapter:env,target:'vk',mode:Platform.mode}},
+  init:function(){
+    if(env==='vk' && bridge){ try{ send('VKWebAppInit',{}); }catch(e){} }
+    Platform.mode = env;
+    return Promise.resolve(ok(env));
+  },
+  showRewarded:function(){
+    if(env!=='vk' || !bridge) return Promise.resolve(fail('local','not_in_vk'));
+    return trySend(['VKWebAppShowRewardedVideo','VKWebAppShowRewarded','VKWebAppShowRewardedAd'],{}).then(function(res){
+      if(res && res.data){
+        if('rewarded' in res.data) return res.data.rewarded ? ok('vk',res.data) : fail('vk','not_rewarded');
+        if('isRewarded' in res.data) return res.data.isRewarded ? ok('vk',res.data) : fail('vk','not_rewarded');
+        if('success' in res.data) return res.data.success ? ok('vk',res.data) : fail('vk','not_rewarded');
+      }
+      return ok('vk',res);
+    }).catch(function(e){ return fail('vk',e); });
+  },
+  showInterstitial:function(){
+    if(env!=='vk' || !bridge) return Promise.resolve(fail('local','not_in_vk'));
+    return trySend(['VKWebAppShowInterstitial','VKWebAppShowInterstitialVideo','VKWebAppShowInterstitialAd'],{}).then(function(res){return ok('vk',res)}).catch(function(e){return fail('vk',e)});
+  },
+  track:function(){return Promise.resolve(ok(env))},
+  cloudSave:function(d){ try{ localStorage.setItem('spaceMineCloud_v1', JSON.stringify(d||{})); }catch(e){} return Promise.resolve(ok(env)); },
+  cloudLoad:function(){ try{ var r=localStorage.getItem('spaceMineCloud_v1'); return Promise.resolve(ok(env, r?JSON.parse(r):null)); }catch(e){ return Promise.resolve(ok(env,null)); } },
+  share:function(payload){
+    var url=(payload&&payload.url)||location.href;
+    var title=(payload&&payload.title)||'Космическая шахта';
+    var text=(payload&&payload.text)||'';
+    if(env==='vk' && bridge){
+      return send('VKWebAppShare',{link:url,title:title,text:text}).then(function(res){return ok('vk',res)}).catch(function(){ return fallbackShare(url,title,text); });
     }
+    return fallbackShare(url,title,text);
+  },
+  isVK:function(){return env==='vk'},
+  isLocal:function(){return env==='local'}
+};
+global.Platform=Platform;
+try{ Platform.init(); }catch(e){}
+})(window);
+</script>
 
-    function openOfflineModal() {
-      if (pendingOffline <= 0) return;
-      openModal(`
-        <h2>С возвращением, командир</h2>
-        <p>Пока ты отсутствовал, оборудование добыло:</p>
-        <p><b>${fmt(pendingOffline)}</b> кристаллов</p>
-        <div class="modal-actions">
-          <button class="btn good" data-action="offlineTake">Забрать</button>
-          <button class="btn primary ad-btn" data-action="offlineDouble">Удвоить за рекламу</button>
-        </div>`);
-    }
+<script>
+(function(){
+var SAVE_KEY='spaceMineLegacyV1';
 
-    function checkOffline() {
-      const now = Date.now();
-      const elapsed = Math.min((now - state.lastSeen) / 1000, OFFLINE_CAP_SECONDS);
-      if (elapsed < 10) return;
-      const gain = getCps() * elapsed * 0.5;
-      if (gain < 1) return;
-      pendingOffline = gain;
-      openOfflineModal();
-    }
+var state={
+  crystals:0,drills:0,drones:0,picks:0,boostUntil:0,soundOn:true,
+  lastSeen:0,lastClaimDay:'',dailyStreak:0,
+  skins:{unlocked:['std'],active:'std'},
+  shards:0,legacies:0,bestCrystals:0,
+  social:{friends:[],lastShare:0,stealsToday:0,helpsToday:0,counterDay:''}
+};
 
-    function openSkinsModal() {
-      const items = SKINS.map(skin => {
-        const owned = state.ownedSkins.includes(skin.id);
-        const equipped = state.skin === skin.id;
-        let action = '';
-        if (equipped) action = '<span class="pill">Надет</span>';
-        else if (owned) action = `<button class="btn good" data-action="skinEquip" data-id="${skin.id}">Надеть</button>`;
-        else { const disabled = state.crystals < skin.cost ? 'disabled' : ''; action = `<button class="btn primary" data-action="skinBuy" data-id="${skin.id}" ${disabled}>Купить ${fmt(skin.cost)}</button>`; }
-        return `
-          <div class="list-item">
-            <div><b>${skin.name}</b><div class="muted">${owned ? 'Открыт' : `Цена: ${fmt(skin.cost)}`}</div></div>
-            <div>${action}</div>
-          </div>`;
-      }).join('');
-      openModal(`
-        <h2>Гараж скинов</h2>
-        <p>Скины открываются за кристаллы или рекламную крутку.</p>
-        <div class="modal-actions"><button class="btn primary ad-btn" data-action="skinSpin">▶ Крутка скина за рекламу</button></div>
-        <div class="list">${items}</div>`);
-    }
+var cfg={
+  drillBase:15,drillGrowth:1.15,drillDps:1,
+  droneBase:100,droneGrowth:1.18,droneDps:5,
+  pickBase:25,pickGrowth:1.17,pickTap:1,
+  boostMs:30000,boostMul:2,
+  msStep:10,msBonus:0.15,
+  offlineRateBase:0.5,offlineMinSec:60,offlineCapSec:2*3600,
+  dailyBoostMs:60000,
+  legacyThreshold:1000000000,
+  legacyBaseMult:1.1,
+  collectSecBase:60,
+  critBase:0.05,critMultBase:10,
+  interEvery:3,
+  helpCd:10*60000,
+  stealCd:30*60000,
+  maxSteals:5,
+  maxHelps:10,
+  shareCd:60*60000
+};
 
-    function equipSkin(id) { if (!state.ownedSkins.includes(id)) return; state.skin = id; saveState(); updateUI(); openSkinsModal(); }
-    function buySkin(id) {
-      const skin = SKINS.find(s => s.id === id);
-      if (!skin || state.ownedSkins.includes(id)) return;
-      if (state.crystals < skin.cost) { toast('Недостаточно кристаллов'); return; }
-      state.crystals -= skin.cost; state.ownedSkins.push(id); state.skin = id;
-      saveState(); updateUI(); openSkinsModal(); toast(`Скин открыт: ${skin.name}`);
-    }
-    function spinSkin() {
-      withRewarded('Крутка завершена', () => {
-        const unowned = SKINS.filter(s => !state.ownedSkins.includes(s.id));
-        if (unowned.length > 0) {
-          const pick = unowned[Math.floor(Math.random() * unowned.length)];
-          state.ownedSkins.push(pick.id); state.skin = pick.id; toast(`Новый скин: ${pick.name}`);
-        } else {
-          const bonus = Math.floor(25_000 * eternalMultiplier());
-          addCrystals(bonus); toast(`Все скины открыты. Бонус: +${fmt(bonus)}`);
-        }
-        saveState(); updateUI(); openSkinsModal();
-      });
-    }
+var TIER_NAMES=['Камень','Астероид','Планета','Звезда'];
+var TIER_COLORS=['#b89a72','#7df9ff','#8a6cff','#ffd36b'];
+var DAILY=[50,100,200,400,800,1600,5000];
+var SKINS=[
+  {id:'std',name:'Стандарт',price:0,desc:'Родная порода'},
+  {id:'ice',name:'Лёд',price:5000,desc:'Мёрзлый астероид'},
+  {id:'lava',name:'Лава',price:25000,desc:'Расплавленное ядро'},
+  {id:'emerald',name:'Изумруд',price:120000,desc:'Кристаллическая жила'},
+  {id:'void',name:'Пустота',price:600000,desc:'Тёмная материя'}
+];
+var FRIEND_NAMES=['Аня','Стас','Луна','Марс','Крипта','Нейрон','Орион','Веста','Титан','Пульсар'];
 
-    function prestigeGain() { if (state.runCrystals < PRESTIGE_THRESHOLD) return 0; return Math.floor(Math.sqrt(state.runCrystals / PRESTIGE_THRESHOLD)); }
-    function getNextHeritageObject() {
-      if (state.shards >= 100) return 'Квазар';
-      if (state.shards >= 50) return 'Нейтронная звезда';
-      if (state.shards >= 20) return 'Газовый гигант';
-      if (state.shards >= 5) return 'Астероид';
-      return 'Рудный астероид';
-    }
-    function openHeritageModal() {
-      const gain = prestigeGain(); const can = gain > 0; const nextObject = getNextHeritageObject();
-      openModal(`
-        <h2>Наследие</h2>
-        <p>Пересобери корабль. Прогресс улучшения сбросится, но ты получишь вечные Осколки звёзд.</p>
-        <p><b>Осколки сейчас:</b> ${fmt(state.shards)}</p>
-        <p><b>Вечный множитель:</b> x${eternalMultiplier().toFixed(2)}</p>
-        <p><b>Получишь при сбросе:</b> +${fmt(gain)}</p>
-        <p><b>Следующий объект:</b> ${nextObject}</p>
-        <div class="modal-actions"><button class="btn primary" data-action="prestige" ${can ? '' : 'disabled'}>Пересобрать корабль</button></div>`);
-    }
-    function doPrestige() {
-      const gain = prestigeGain();
-      if (gain <= 0) { toast('Нужно больше кристаллов за этот забег'); return; }
-      state.shards += gain; state.crystals = 0; state.runCrystals = 0;
-      state.drill = 0; state.drone = 0; state.pickaxe = 0; state.boostUntil = 0; state.comboCount = 0;
-      saveState(); renderUpgrades(); updateUI(); closeModal();
-      toast(`Наследие укреплено: +${fmt(gain)} осколков`);
-      setTimeout(() => maybeInterstitial(true), 4000);
-    }
+function $(id){return document.getElementById(id)}
+var el={
+  app:$('app'),tierLine:$('tierLine'),crystals:$('crystals'),perSecond:$('perSecond'),shards:$('shards'),legacyMult:$('legacyMult'),
+  mineBtn:$('mineBtn'),tapPower:$('tapPower'),boostInfo:$('boostInfo'),combo:$('combo'),
+  adBtn:$('adBtn'),collectBtn:$('collectBtn'),saveBtn:$('saveBtn'),resetBtn:$('resetBtn'),soundBtn:$('soundBtn'),
+  shopBtn:$('shopBtn'),legacyBtn:$('legacyBtn'),socialBtn:$('socialBtn'),
+  drillCount:$('drillCount'),droneCount:$('droneCount'),pickCount:$('pickCount'),
+  drillCost:$('drillCost'),droneCost:$('droneCost'),pickCost:$('pickCost'),
+  drillMs:$('drillMs'),droneMs:$('droneMs'),pickMs:$('pickMs'),
+  synTotal:$('synTotal'),synDrill:$('synDrill'),synDrone:$('synDrone'),synPick:$('synPick'),
+  synDrillBar:$('synDrillBar'),synDroneBar:$('synDroneBar'),synPickBar:$('synPickBar'),
+  buyDrill:$('buyDrill'),buyDrone:$('buyDrone'),buyPick:$('buyPick'),
+  dailyBtn:$('dailyBtn'),dailyStatus:$('dailyStatus'),dailyBadge:$('dailyBadge'),
+  offlineModal:$('offlineModal'),offlineAmount:$('offlineAmount'),offlineNote:$('offlineNote'),offlineTake:$('offlineTake'),offlineX2:$('offlineX2'),
+  dailyModal:$('dailyModal'),dailySub:$('dailySub'),dailyGrid:$('dailyGrid'),dailyBonus:$('dailyBonus'),dailyClose:$('dailyClose'),dailyClaim:$('dailyClaim'),dailyX2:$('dailyX2'),
+  shopModal:$('shopModal'),shopClose:$('shopClose'),skinsGrid:$('skinsGrid'),spinBtn:$('spinBtn'),spinResult:$('spinResult'),
+  legacyModal:$('legacyModal'),legacyClose:$('legacyClose'),doLegacy:$('doLegacy'),legShards:$('legShards'),legMult:$('legMult'),legGain:$('legGain'),legReq:$('legReq'),legNext:$('legNext'),
+  socialModal:$('socialModal'),socialClose:$('socialClose'),friendsList:$('friendsList'),shareBtn:$('shareBtn'),socialInfo:$('socialInfo'),
+  toast:$('toast')
+};
+var miniDrones=document.querySelectorAll('.mini-drone');
+var miniDrills=document.querySelectorAll('.mini-drill');
 
-    function ensureFriends() {
-      if (state.friends.length > 0) return;
-      state.friends = FRIEND_NAMES.slice(0, 5).map((name, index) => ({
-        id: `npc_${index}`, name,
-        crystals: Math.floor(1000 * (index + 1) * (1 + state.shards * 0.2)),
-        lastHelp: 0, lastSteal: 0
-      }));
-      saveState();
-    }
-    function formatCooldown(ms) {
-      const totalMinutes = Math.ceil(ms / 60000);
-      if (totalMinutes >= 60) { const hours = Math.floor(totalMinutes / 60); const minutes = totalMinutes % 60; return `${hours}ч ${minutes}м`; }
-      return `${totalMinutes} мин`;
-    }
-    function openFriendsModal() {
-      ensureFriends();
-      const now = Date.now();
-      const items = state.friends.map(friend => {
-        const helpLeft = Math.max(0, 4 * 60 * 60 * 1000 - (now - friend.lastHelp));
-        const stealLeft = Math.max(0, 8 * 60 * 60 * 1000 - (now - friend.lastSteal));
-        const helpDisabled = helpLeft > 0 ? 'disabled' : '';
-        const stealDisabled = stealLeft > 0 ? 'disabled' : '';
-        return `
-          <div class="list-item">
-            <div>
-              <b>${friend.name}</b>
-              <div class="muted">Ресурсы: ${fmt(friend.crystals)}</div>
-              ${helpLeft > 0 ? `<div class="muted small">Помощь через ${formatCooldown(helpLeft)}</div>` : ''}
-              ${stealLeft > 0 ? `<div class="muted small">Кража через ${formatCooldown(stealLeft)}</div>` : ''}
-            </div>
-            <div style="display:grid;gap:6px;">
-              <button class="btn good" data-action="friendHelp" data-id="${friend.id}" ${helpDisabled}>Помочь</button>
-              <button class="btn danger" data-action="friendSteal" data-id="${friend.id}" ${stealDisabled}>Украсть</button>
-            </div>
-          </div>`;
-      }).join('');
-      openModal(`
-        <h2>Социальный модуль</h2>
-        <p>Помогай соседям по галактике, кради ресурсы и зови новых игроков.</p>
-        <div class="modal-actions"><button class="btn primary ad-btn" data-action="shareInvite">📣 Поделиться / позвать друга</button></div>
-        <div class="list">${items}</div>`);
-    }
-    function helpFriend(id) {
-      const friend = state.friends.find(f => f.id === id); if (!friend) return;
-      const now = Date.now();
-      if (now - friend.lastHelp < 4 * 60 * 60 * 1000) { toast('Помощь недоступна, подожди'); return; }
-      friend.lastHelp = now;
-      const bonus = Math.floor(friend.crystals * 0.02 + 100 * eternalMultiplier());
-      addCrystals(bonus); friend.crystals = Math.max(0, friend.crystals - Math.floor(bonus * 0.5));
-      saveState(); updateUI(); openFriendsModal(); toast(`Помощь принята: +${fmt(bonus)}`);
-    }
-    function stealFriend(id) {
-      const friend = state.friends.find(f => f.id === id); if (!friend) return;
-      const now = Date.now();
-      if (now - friend.lastSteal < 8 * 60 * 60 * 1000) { toast('Кража недоступна, подожди'); return; }
-      friend.lastSteal = now;
-      const amount = Math.floor(friend.crystals * 0.05);
-      friend.crystals = Math.max(0, friend.crystals - amount); addCrystals(amount);
-      saveState(); updateUI(); openFriendsModal(); toast(`Украдено: +${fmt(amount)}`);
-    }
+var ctx=null,master=null,comp=null,noiseBuf=null;
+var ambientBus=null,machineBus=null,machineOsc1=null,machineOsc2=null,machineFilter=null;
+var ambOsc1=null,ambOsc2=null;
+var ambientStarted=false,lastDig=0,comboCount=0,comboTimer=null;
 
-    async function shareInvite() {
-      const baseUrl = `${location.origin}${location.pathname}`;
-      const link = `${baseUrl}?ref=${encodeURIComponent(myId)}`;
-      const result = await Platform.share(link, 'Космическая шахта — Наследие', 'Залетай в космическую шахту: кликай, прокачивай дронов и уходи в наследие.');
-      if (result === 'copied') toast('Ссылка скопирована');
-      else if (result === 'failed') toast('Не удалось поделиться');
-    }
+function safeExp(p,v,t){try{p.exponentialRampToValueAtTime(Math.max(0.0001,v),t)}catch(e){}}
+function setV(p,v,t){try{p.setValueAtTime(v,t)}catch(e){}}
+function ensureAudio(){try{
+  if(ctx){if(ctx.state==='suspended')ctx.resume();return}
+  var AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;
+  ctx=new AC();if(ctx.state==='suspended')ctx.resume();
+  master=ctx.createGain();master.gain.value=state.soundOn?0.9:0.0001;
+  comp=ctx.createDynamicsCompressor();try{comp.threshold.value=-14;comp.knee.value=18;comp.ratio.value=6;comp.attack.value=0.003;comp.release.value=0.18}catch(e){}
+  master.connect(comp);comp.connect(ctx.destination);
+  var len=Math.floor(ctx.sampleRate*0.5);noiseBuf=ctx.createBuffer(1,len,ctx.sampleRate);
+  var d=noiseBuf.getChannelData(0);for(var i=0;i<len;i++)d[i]=Math.random()*2-1;
+  startAmbient();updateMachineSound();setAmbientTier();
+}catch(e){ctx=null}}
+function tone(type,f0,f1,t,peak,a,dec,dest,det){if(!ctx)return;try{
+  var o=ctx.createOscillator(),g=ctx.createGain();o.type=type||'sine';setV(o.frequency,Math.max(1,f0),t);
+  if(f1&&f1!==f0)safeExp(o.frequency,Math.max(1,f1),t+a+dec);
+  if(det){try{o.detune.setValueAtTime(det,t)}catch(e){}}
+  setV(g.gain,0.0001,t);safeExp(g.gain,peak,t+a);safeExp(g.gain,0.0001,t+a+dec);
+  o.connect(g);g.connect(dest||master);o.start(t);o.stop(t+a+dec+0.06);
+}catch(e){}}
+function noiseBurst(t,peak,dur,freq,q,dest,ft){if(!ctx||!noiseBuf)return;try{
+  var s=ctx.createBufferSource();s.buffer=noiseBuf;var f=ctx.createBiquadFilter();f.type=ft||'bandpass';
+  setV(f.frequency,Math.max(20,freq||2200),t);try{f.Q.value=q||1}catch(e){}
+  var g=ctx.createGain();setV(g.gain,0.0001,t);safeExp(g.gain,peak,t+0.005);safeExp(g.gain,0.0001,t+dur);
+  s.connect(f);f.connect(g);g.connect(dest||master);s.start(t);s.stop(t+dur+0.06);
+}catch(e){}}
+function metallic(t,bf,peak,dest){if(!ctx)return;var m=[1,2.01,3.03,4.72,6.13],gn=[1,0.55,0.34,0.20,0.12],dc=[0.30,0.23,0.17,0.12,0.09];for(var i=0;i<m.length;i++)tone('triangle',bf*m[i],bf*m[i]*1.002,t+i*0.004,peak*gn[i],0.004,dc[i],dest)}
+function playDig(crit){if(!ctx||!state.soundOn)return;var n=Date.now();if(n-lastDig<35)return;lastDig=n;var t=ctx.currentTime+0.001;var cp=1+Math.min(comboCount,30)*0.014;
+  tone('sine',(92+Math.random()*22)*cp,42*cp,t,0.22,0.004,0.14);noiseBurst(t,0.085,0.075,320,0.8,master,'lowpass');
+  var b=(1250+Math.random()*560)*cp;tone('triangle',b,b*1.01,t+0.008,0.045,0.004,0.13);tone('triangle',b*1.5,b*1.5,t+0.014,0.025,0.004,0.10);
+  if(state.picks>0&&Math.random()<0.58){metallic(t+0.005,(1750+Math.random()*650)*cp,0.034,master);noiseBurst(t+0.004,0.028,0.052,4300,2.0,master,'bandpass')}
+  if(state.drills>0&&Math.random()<0.36){tone('sawtooth',(105+Math.random()*25)*cp,155*cp,t+0.010,0.030,0.010,0.12);noiseBurst(t+0.010,0.024,0.075,900,1.2,master,'bandpass')}
+  if(state.drones>0&&Math.random()<0.32){tone('sine',880*cp,1320*cp,t+0.020,0.022,0.005,0.08);tone('sine',1320*cp,1760*cp,t+0.050,0.014,0.005,0.06)}
+  if(boostOn()){tone('square',2400,720,t,0.035,0.004,0.09);noiseBurst(t,0.028,0.06,6200,2.0,master,'highpass')}
+  if(crit){tone('triangle',2093*cp,2093*cp,t,0.10,0.004,0.22);tone('triangle',2637*cp,2637*cp,t+0.03,0.08,0.004,0.20);tone('sine',1046*cp,1568*cp,t,0.07,0.004,0.30);noiseBurst(t,0.05,0.12,7000,2.0,master,'highpass')}
+}
+function playBuy(type){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;
+  if(type==='drill'){tone('sine',70,132,t,0.16,0.010,0.22);noiseBurst(t,0.095,0.18,900,1.0,master,'bandpass');for(var i=0;i<5;i++)tone('square',175+i*26,175+i*26,t+0.04*i,0.034,0.003,0.035);tone('triangle',900,1220,t+0.22,0.060,0.005,0.18);noiseBurst(t+0.22,0.025,0.05,3200,1.6,master,'highpass')}
+  if(type==='drone'){tone('sawtooth',180,265,t,0.050,0.020,0.35);tone('sawtooth',184,270,t,0.045,0.020,0.35,master,8);for(var j=0;j<4;j++)noiseBurst(t+j*0.07,0.025,0.04,3200,2.0,master,'bandpass');tone('sine',988,988,t+0.28,0.070,0.005,0.25);tone('sine',1319,1319,t+0.32,0.045,0.005,0.22)}
+  if(type==='pick'){metallic(t,660,0.130,master);tone('sine',120,80,t,0.120,0.004,0.12);noiseBurst(t,0.050,0.05,5200,1.5,master,'highpass');tone('triangle',1980,1980,t+0.03,0.040,0.004,0.18)}
+}
+function playBoost(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;tone('sawtooth',150,1800,t,0.100,0.030,0.45);noiseBurst(t,0.045,0.35,1200,1.0,master,'bandpass');var ns=[523.25,659.25,783.99,1046.50];for(var i=0;i<ns.length;i++)tone('triangle',ns[i],ns[i],t+0.08*i,0.070,0.005,0.35);for(var j=0;j<6;j++)tone('sine',2000+Math.random()*1600,2400+Math.random()*1800,t+0.20+Math.random()*0.22,0.024,0.004,0.12)}
+function playAdDone(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;tone('triangle',880,880,t,0.090,0.005,0.12);tone('triangle',1320,1320,t+0.10,0.090,0.005,0.16)}
+function playCollect(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;for(var i=0;i<5;i++)tone('triangle',660+i*110,660+i*110,t+i*0.04,0.06,0.004,0.18);noiseBurst(t,0.04,0.2,4000,1.4,master,'highpass')}
+function playOfflineReward(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;var ns=[392,523.25,659.25,783.99,1046.5,1318.51];for(var i=0;i<ns.length;i++)tone('triangle',ns[i],ns[i],t+i*0.07,0.070,0.005,0.30);tone('sine',2093,2093,t+0.50,0.050,0.005,0.50);noiseBurst(t+0.05,0.030,0.40,5000,1.5,master,'highpass')}
+function playDailyReward(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;var ch=[523.25,659.25,783.99];for(var i=0;i<ch.length;i++)tone('triangle',ch[i],ch[i],t,0.060,0.005,0.50);tone('sine',1046.5,1046.5,t+0.18,0.060,0.005,0.60);tone('sine',1567.98,1567.98,t+0.30,0.040,0.005,0.50);noiseBurst(t,0.025,0.25,3000,1.2,master,'bandpass')}
+function playDenied(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;tone('square',140,90,t,0.050,0.004,0.12)}
+function playSkin(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;try{var o=ctx.createOscillator(),g=ctx.createGain(),bp=ctx.createBiquadFilter();o.type='sine';setV(o.frequency,300,t);safeExp(o.frequency,1400,t+0.18);bp.type='bandpass';setV(bp.frequency,900,t);bp.Q.value=1.2;setV(g.gain,0.0001,t);safeExp(g.gain,0.07,t+0.05);safeExp(g.gain,0.0001,t+0.30);o.connect(bp);bp.connect(g);g.connect(master);o.start(t);o.stop(t+0.36)}catch(e){}tone('triangle',1567.98,1567.98,t+0.16,0.050,0.005,0.30);tone('sine',2348.98,2348.98,t+0.22,0.030,0.005,0.25)}
+function playLegacy(){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;
+  try{var o=ctx.createOscillator(),g=ctx.createGain(),lp=ctx.createBiquadFilter();o.type='sawtooth';setV(o.frequency,55,t);safeExp(o.frequency,1800,t+0.9);lp.type='lowpass';setV(lp.frequency,220,t);safeExp(lp.frequency,8000,t+0.9);setV(g.gain,0.0001,t);safeExp(g.gain,0.14,t+0.08);safeExp(g.gain,0.0001,t+1.1);o.connect(lp);lp.connect(g);g.connect(master);o.start(t);o.stop(t+1.2)}catch(e){}
+  var ch=[130.81,164.81,196,261.63,329.63,392,523.25,659.25,783.99,1046.5];for(var i=0;i<ch.length;i++)tone('triangle',ch[i],ch[i],t+0.08+i*0.055,0.065,0.006,0.70);
+  noiseBurst(t+0.12,0.055,0.85,5200,1.1,master,'highpass');
+}
+function playSocial(kind){if(!ctx||!state.soundOn)return;var t=ctx.currentTime+0.001;
+  if(kind==='help'){tone('triangle',659.25,659.25,t,0.06,0.004,0.18);tone('triangle',987.77,987.77,t+0.08,0.055,0.004,0.22);tone('sine',1318.51,1318.51,t+0.16,0.035,0.004,0.25)}
+  if(kind==='steal'){tone('sawtooth',220,90,t,0.06,0.004,0.18);noiseBurst(t,0.04,0.18,2800,1.6,master,'bandpass');tone('square',880,1320,t+0.10,0.04,0.004,0.14)}
+  if(kind==='share'){tone('triangle',783.99,783.99,t,0.055,0.004,0.16);tone('triangle',1174.66,1174.66,t+0.08,0.05,0.004,0.20)}
+}
+function startAmbient(){if(ambientStarted||!ctx||!master)return;ambientStarted=true;try{
+  var t=ctx.currentTime;ambientBus=ctx.createGain();setV(ambientBus.gain,0.0001,t);ambientBus.connect(master);
+  var lp=ctx.createBiquadFilter();lp.type='lowpass';setV(lp.frequency,520,t);lp.connect(ambientBus);
+  ambOsc1=ctx.createOscillator();ambOsc2=ctx.createOscillator();var g1=ctx.createGain(),g2=ctx.createGain();
+  ambOsc1.type='sine';ambOsc2.type='sine';setV(ambOsc1.frequency,55,t);setV(ambOsc2.frequency,82.41,t);g1.gain.value=0.07;g2.gain.value=0.045;
+  ambOsc1.connect(g1);ambOsc2.connect(g2);g1.connect(lp);g2.connect(lp);ambOsc1.start(t);ambOsc2.start(t);
+  var lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.type='sine';lfo.frequency.value=0.06;lg.gain.value=0.018;lfo.connect(lg);lg.connect(ambientBus.gain);lfo.start(t);safeExp(ambientBus.gain,0.040,t+4);
+  machineBus=ctx.createGain();setV(machineBus.gain,0.0001,t);machineBus.connect(master);
+  machineFilter=ctx.createBiquadFilter();machineFilter.type='lowpass';setV(machineFilter.frequency,240,t);machineFilter.connect(machineBus);
+  machineOsc1=ctx.createOscillator();machineOsc2=ctx.createOscillator();var m1=ctx.createGain(),m2=ctx.createGain();
+  machineOsc1.type='sawtooth';machineOsc2.type='sawtooth';setV(machineOsc1.frequency,58,t);setV(machineOsc2.frequency,87,t);m1.gain.value=0.08;m2.gain.value=0.05;
+  machineOsc1.connect(m1);machineOsc2.connect(m2);m1.connect(machineFilter);m2.connect(machineFilter);machineOsc1.start(t);machineOsc2.start(t);scheduleBell();
+}catch(e){}}
+function setAmbientTier(){if(!ctx||!ambOsc1||!ambOsc2)return;try{var roots=[55,65.41,73.42,82.41];var r=roots[getTier()]||55;ambOsc1.frequency.setTargetAtTime(r,ctx.currentTime,1.2);ambOsc2.frequency.setTargetAtTime(r*1.5,ctx.currentTime,1.2)}catch(e){}}
+function scheduleBell(){setTimeout(function(){if(ctx&&state.soundOn&&ambientBus){try{var t=ctx.currentTime+Math.random()*0.2;var roots=[261.63,329.63,392,440];var root=roots[getTier()]||261.63;var semis=[0,3,5,7,10,12];var f=root*Math.pow(2,semis[Math.floor(Math.random()*semis.length)]/12);tone('sine',f,f,t,0.018,0.08,1.2,ambientBus)}catch(e){}}scheduleBell()},7000+Math.random()*8000)}
+function updateMachineSound(){if(!ctx||!machineBus)return;try{
+  var lvl=state.soundOn?Math.min(0.055,0.004+state.drills*0.0012+state.drones*0.0035):0.0001;
+  machineBus.gain.setTargetAtTime(lvl,ctx.currentTime,0.4);
+  var f1=54+Math.min(90,state.drills*1.2+state.drones*2.8);
+  if(machineOsc1)machineOsc1.frequency.setTargetAtTime(f1,ctx.currentTime,0.5);
+  if(machineOsc2)machineOsc2.frequency.setTargetAtTime(f1*1.5,ctx.currentTime,0.5);
+  if(machineFilter)machineFilter.frequency.setTargetAtTime(220+Math.min(950,state.drones*42+state.drills*9),ctx.currentTime,0.5);
+}catch(e){}}
+function applySound(){try{el.soundBtn.classList.toggle('muted',!state.soundOn)}catch(e){}if(!ctx||!master)return;try{master.gain.setTargetAtTime(state.soundOn?0.9:0.0001,ctx.currentTime,0.05)}catch(e){master.gain.value=state.soundOn?0.9:0.0001}updateMachineSound()}
+function toggleSound(){state.soundOn=!state.soundOn;ensureAudio();applySound();save();if(state.soundOn){try{playAdDone()}catch(e){}}}
 
-    function setupPlayerId() {
-      const storedId = Platform.storageGet('spaceMinePlayerId', '');
-      if (storedId) { myId = storedId; return; }
-      const randomId = `p_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
-      myId = randomId; Platform.storageSet('spaceMinePlayerId', myId);
-    }
-    async function setupVKUser() {
-      const user = await Platform.getUser();
-      if (user && user.id) { myId = `vk_${user.id}`; Platform.storageSet('spaceMinePlayerId', myId); }
-    }
-    function handleReferral() {
-      const ref = Platform.getParam('ref');
-      if (!ref || ref === myId || state.inviteClaimed) return;
-      state.inviteClaimed = true; state.invitedBy = ref;
-      const bonus = Math.floor(1000 * eternalMultiplier());
-      addCrystals(bonus); saveState(); updateUI(); toast(`Бонус по приглашению: +${fmt(bonus)}`);
-    }
+function getTier(){return Math.min(3,state.legacies)}
+function msCnt(n){return Math.floor(n/cfg.msStep)}
+function msGlobal(){return 1+cfg.msBonus*(msCnt(state.drills)+msCnt(state.drones))}
+function msTap(){return 1+cfg.msBonus*msCnt(state.picks)}
+function legacyMult(){return Math.min(1e12,Math.pow(cfg.legacyBaseMult,Math.min(state.shards,800)))}
+function baseDps(){return (state.drills*cfg.drillDps+state.drones*cfg.droneDps)*msGlobal()*legacyMult()}
+function baseTap(){return (1+state.picks*cfg.pickTap)*msTap()*legacyMult()}
+function threshold(){return cfg.legacyThreshold}
+function canLegacy(){return state.crystals>=threshold()}
+function legacyGain(){if(!canLegacy())return 0;var ratio=state.crystals/threshold();return Math.max(1,Math.floor(Math.log10(Math.max(1,ratio))*5)+1)}
+function boostOn(){return Date.now()<state.boostUntil}
+function mul(){return boostOn()?cfg.boostMul:1}
+function tapVal(){return baseTap()*mul()}
+function dpsVal(){return baseDps()*mul()}
+function critChance(){return Math.min(0.28,cfg.critBase+Math.min(comboCount,30)*0.004)}
+function critMult(){return cfg.critMultBase+Math.min(comboCount,20)*0.25}
+function ev(name,params){try{if(window.Platform)Platform.track(name,params)}catch(e){}}
+function emit(name,detail){try{window.dispatchEvent(new CustomEvent('sm_'+name,{detail:detail||{}}))}catch(e){}}
 
-    function bindEvents() {
-      dom.asteroid.addEventListener('pointerdown', mineClick);
-      dom.btnBoost.addEventListener('click', () => withRewarded('Буст x2 на 30 секунд активирован', activateBoost));
-      dom.btnCollect.addEventListener('click', () => withRewarded('Мгновенный сбор за 60 секунд получен', () => { const gain = collectForSeconds(60); toast(`Собрано: +${fmt(gain)}`); }));
-      dom.btnDaily.addEventListener('click', openDailyModal);
-      dom.btnSkins.addEventListener('click', openSkinsModal);
-      dom.btnHeritage.addEventListener('click', openHeritageModal);
-      dom.btnFriends.addEventListener('click', openFriendsModal);
-      dom.btnShare.addEventListener('click', shareInvite);
-      dom.btnSave.addEventListener('click', () => { saveState(); toast('Игра сохранена'); });
-      dom.btnReset.addEventListener('click', () => openModal(`
-        <h2>Сброс</h2>
-        <p>Точно сбросить весь прогресс? Это действие нельзя отменить.</p>
-        <div class="modal-actions">
-          <button class="btn danger" data-action="confirmReset">Да, сбросить</button>
-          <button class="btn" data-action="close">Отмена</button>
-        </div>`));
-      dom.upgrades.addEventListener('click', event => { const btn = event.target.closest('[data-buy]'); if (!btn) return; buyUpgrade(btn.dataset.buy); });
-      dom.modalBody.addEventListener('click', event => {
-        const btn = event.target.closest('[data-action]'); if (!btn) return;
-        const action = btn.dataset.action;
-        const id = btn.dataset.id ? Number(btn.dataset.id) : null;
-        switch (action) {
-          case 'close': closeModal(); break;
-          case 'confirmReset': resetState(); closeModal(); break;
-          case 'offlineTake': addCrystals(pendingOffline); pendingOffline = 0; saveState(); updateUI(); closeModal(); toast('Оффлайн-доход собран'); break;
-          case 'offlineDouble': withRewarded('Оффлайн-доход удвоен', () => { addCrystals(pendingOffline * 2); pendingOffline = 0; saveState(); updateUI(); closeModal(); }); break;
-          case 'dailyClaim': claimDaily(1); break;
-          case 'dailyDouble': withRewarded('Ежедневная награда удвоена', () => claimDaily(2)); break;
-          case 'skinEquip': equipSkin(id); break;
-          case 'skinBuy': buySkin(id); break;
-          case 'skinSpin': spinSkin(); break;
-          case 'prestige': doPrestige(); break;
-          case 'friendHelp': helpFriend(btn.dataset.id); break;
-          case 'friendSteal': stealFriend(btn.dataset.id); break;
-          case 'shareInvite': shareInvite(); break;
-        }
-      });
-      dom.overlay.addEventListener('click', event => { if (event.target === dom.overlay) closeModal(); });
-      document.addEventListener('visibilitychange', () => { if (document.hidden) saveState(); });
-      window.addEventListener('beforeunload', saveState);
-    }
+function fmt(n){n=Math.floor(n);if(n<1000)return String(n);var u=['K','M','B','T','Qa','Qi','Sx','Sp'],i=-1;while(n>=1000&&i<u.length-1){n/=1000;i++}return n.toFixed(n<10?2:n<100?1:0)+u[i]}
+function formatMult(x){return x<100?'x'+x.toFixed(2):'x'+fmt(x)}
+function pct(x){return '+'+Math.round((x-1)*100)+'%'}
+function pad2(n){return(n<10?'0':'')+n}
+function dayKey(d){return d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate())}
+function parseKey(s){var p=s.split('-');return new Date(+p[0],(+p[1])-1,+p[2])}
+function midnight(d){return new Date(d.getFullYear(),d.getMonth(),d.getDate())}
+function humanTime(sec){sec=Math.floor(sec);var h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60);if(h>0)return h+' ч '+m+' м';if(m>0)return m+' м';return sec+' с'}
+function timeToNext(){var n=new Date(),tm=new Date(n.getFullYear(),n.getMonth(),n.getDate()+1,0,0,0,0);return humanTime(Math.max(0,Math.floor((tm-n)/1000)))}
+function animateNumber(node,from,to,ms){if(node._raf)cancelAnimationFrame(node._raf);var t0=performance.now();function step(now){var k=Math.min(1,(now-t0)/ms);var v=Math.floor(from+(to-from)*(1-Math.pow(1-k,3)));node.textContent=fmt(v);if(k<1)node._raf=requestAnimationFrame(step);else node._raf=null}node._raf=requestAnimationFrame(step)}
+function cost(b,g,c){return Math.floor(b*Math.pow(g,c))}
 
-    function tick() {
-      const now = performance.now();
-      const dt = Math.max(0, (now - lastTick) / 1000);
-      lastTick = now;
-      addCrystals(getCps() * dt);
-      if (Date.now() > state.comboExpire) state.comboCount = 0;
-      updateUI();
-    }
+function bump(node){try{node.classList.remove('bump');void node.offsetWidth;node.classList.add('bump')}catch(e){}}
+function shake(){try{el.app.classList.remove('shake');void el.app.offsetWidth;el.app.classList.add('shake')}catch(e){}}
+function showCombo(){try{el.combo.textContent='COMBO x'+comboCount;el.combo.classList.add('show','pop');setTimeout(function(){el.combo.classList.remove('pop')},120)}catch(e){}}
+function hideCombo(){try{el.combo.classList.remove('show')}catch(e){}}
+function registerTap(){comboCount++;if(comboTimer)clearTimeout(comboTimer);comboTimer=setTimeout(function(){comboCount=0;hideCombo()},900);if(comboCount>=2)showCombo()}
+function updateTier(){var t=getTier();document.body.setAttribute('data-tier',String(t));document.documentElement.style.setProperty('--stage',TIER_COLORS[t]);try{el.tierLine.textContent='Небесное тело: '+TIER_NAMES[t]}catch(e){}setAmbientTier()}
+function setSkinClass(id){var c=['skin-ice','skin-lava','skin-emerald','skin-void'];for(var i=0;i<c.length;i++)el.mineBtn.classList.remove(c[i]);if(id&&id!=='std')el.mineBtn.classList.add('skin-'+id)}
+function applyActiveSkin(){setSkinClass(state.skins.active)}
+var toastTimer=null;
+function toast(text,type){try{el.toast.textContent=text;el.toast.className='toast show '+(type||'');if(toastTimer)clearTimeout(toastTimer);toastTimer=setTimeout(function(){el.toast.className='toast '+(type||'')},2200)}catch(e){}}
 
-    async function boot() {
-      await Platform.init();
-      buildStars();
-      setupPlayerId();
-      await setupVKUser();
-      handleReferral();
-      bindEvents();
-      renderUpgrades();
-      updateUI();
-      checkOffline();
-      setInterval(tick, 100);
-      setInterval(saveState, 10_000);
-    }
+function updateMachineVisuals(){try{for(var i=0;i<miniDrones.length;i++)miniDrones[i].classList.toggle('show',state.drones>i);for(var j=0;j<miniDrills.length;j++)miniDrills[j].classList.toggle('show',state.drills>j)}catch(e){}}
+function render(){
+  el.crystals.textContent=fmt(state.crystals);
+  el.perSecond.textContent=fmt(dpsVal());
+  el.shards.textContent=fmt(state.shards);
+  el.legacyMult.textContent=formatMult(legacyMult());
+  el.tapPower.textContent=fmt(tapVal());
+  el.drillCount.textContent=state.drills;el.droneCount.textContent=state.drones;el.pickCount.textContent=state.picks;
+  var dc=cost(cfg.drillBase,cfg.drillGrowth,state.drills),nc=cost(cfg.droneBase,cfg.droneGrowth,state.drones),pc=cost(cfg.pickBase,cfg.pickGrowth,state.picks);
+  el.drillCost.textContent=fmt(dc);el.droneCost.textContent=fmt(nc);el.pickCost.textContent=fmt(pc);
+  el.buyDrill.disabled=state.crystals<dc;el.buyDrone.disabled=state.crystals<nc;el.buyPick.disabled=state.crystals<pc;
+  var dN=(msCnt(state.drills)+1)*cfg.msStep-state.drills,nN=(msCnt(state.drones)+1)*cfg.msStep-state.drones,pN=(msCnt(state.picks)+1)*cfg.msStep-state.picks;
+  el.drillMs.textContent='Синергия '+pct(1+cfg.msBonus*msCnt(state.drills))+' · до +15%: ещё '+dN;
+  el.droneMs.textContent='Синергия '+pct(1+cfg.msBonus*msCnt(state.drones))+' · до +15%: ещё '+nN;
+  el.pickMs.textContent='Синергия '+pct(1+cfg.msBonus*msCnt(state.picks))+' · до +15%: ещё '+pN;
+  var sd=cfg.msBonus*msCnt(state.drills),sn=cfg.msBonus*msCnt(state.drones),sp=cfg.msBonus*msCnt(state.picks);
+  el.synDrill.textContent=pct(1+sd);el.synDrone.textContent=pct(1+sn);el.synPick.textContent=pct(1+sp);
+  el.synTotal.textContent='доход '+formatMult(msGlobal()*legacyMult())+' · тап '+formatMult(msTap()*legacyMult());
+  el.synDrillBar.style.width=((state.drills%cfg.msStep)/cfg.msStep*100)+'%';
+  el.synDroneBar.style.width=((state.drones%cfg.msStep)/cfg.msStep*100)+'%';
+  el.synPickBar.style.width=((state.picks%cfg.msStep)/cfg.msStep*100)+'%';
+  el.legacyBtn.classList.toggle('ready',canLegacy());
+  if(boostOn()){var left=Math.ceil((state.boostUntil-Date.now())/1000);el.boostInfo.textContent='Буст активен: x'+cfg.boostMul+', осталось '+left+' сек';el.boostInfo.classList.add('on');el.adBtn.classList.add('active-boost');el.adBtn.disabled=true}
+  else{el.boostInfo.textContent='Крит: '+Math.round(critChance()*100)+'% шанс · x'+critMult().toFixed(1);el.boostInfo.classList.remove('on');el.adBtn.classList.remove('active-boost');el.adBtn.disabled=false}
+  updateMachineVisuals();updateDailyButton();
+}
 
-    boot();
-  </script>
+function floatText(x,y,text,crit){var d=document.createElement('div');d.className='float-text'+(crit?' crit':'');d.style.left=x+'px';d.style.top=y+'px';d.textContent=text;document.body.appendChild(d);setTimeout(function(){d.remove()},crit?1000:820)}
+function sparks(x,y,crit){var n=crit?18:9;for(var i=0;i<n;i++){var p=document.createElement('div');p.className='particle'+(crit&&Math.random()<0.6?' gold':'');p.style.left=x+'px';p.style.top=y+'px';if(!crit&&Math.random()<0.25){p.style.background='var(--pink)';p.style.boxShadow='0 0 9px var(--pink)'}document.body.appendChild(p);var a=Math.random()*Math.PI*2,dd=(crit?70:42)+Math.random()*(crit?120:68),dx=Math.cos(a)*dd,dy=Math.sin(a)*dd-22;(function(pp,dx,dy){requestAnimationFrame(function(){requestAnimationFrame(function(){pp.style.transform='translate('+dx+'px,'+dy+'px) scale(0.18)';pp.style.opacity='0'})});setTimeout(function(){pp.remove()},crit?750:620)})(p,dx,dy)}}
+function mine(e){
+  ensureAudio();registerTap();
+  var crit=false;if(Math.random()<critChance())crit=true;
+  var gain=baseTap()*mul()*(crit?critMult():1);
+  state.crystals+=gain;if(state.crystals>state.bestCrystals)state.bestCrystals=state.crystals;
+  bump(el.crystals);render();ev('tap',{gain:Math.floor(gain),crit:crit,combo:comboCount});emit('tap',{crystals:state.crystals});
+  try{playDig(crit)}catch(err){}
+  try{var r=el.mineBtn.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;if(e&&e.clientX){x=e.clientX;y=e.clientY}
+    floatText(x,y-10,(crit?'КРИТ ':'+')+fmt(gain),crit);sparks(x,y,crit);
+    el.mineBtn.classList.remove('hit');void el.mineBtn.offsetWidth;el.mineBtn.classList.add('hit');
+    if(crit)shake();
+  }catch(err){}
+}
+
+function buy(type){ensureAudio();
+  if(type==='drill'){var c=cost(cfg.drillBase,cfg.drillGrowth,state.drills);if(state.crystals<c)return;state.crystals-=c;state.drills++;ev('buy_upgrade',{type:type,cost:c})}
+  if(type==='drone'){var c2=cost(cfg.droneBase,cfg.droneGrowth,state.drones);if(state.crystals<c2)return;state.crystals-=c2;state.drones++;ev('buy_upgrade',{type:type,cost:c2})}
+  if(type==='pick'){var c3=cost(cfg.pickBase,cfg.pickGrowth,state.picks);if(state.crystals<c3)return;state.crystals-=c3;state.picks++;ev('buy_upgrade',{type:type,cost:c3})}
+  bump(el.crystals);try{playBuy(type)}catch(e){}updateMachineSound();save();render();emit('buy',{type:type,drills:state.drills,drones:state.drones,picks:state.picks});
+}
+
+var rewardedSinceInter=0;
+function maybeInterstitial(){if(!window.Platform)return;rewardedSinceInter++;if(rewardedSinceInter<cfg.interEvery)return;rewardedSinceInter=0;setTimeout(function(){Platform.showInterstitial().then(function(res){ev('interstitial_result',{ok:!!(res&&res.ok),mode:res&&res.mode})}).catch(function(err){ev('interstitial_failed',{error:String(err)})})},1200)}
+function rewardedThen(cb){ev('ad_requested',{type:'rewarded'});if(!window.Platform){cb(false);toast('Реклама недоступна. Открой игру внутри VK.','bad');return}Platform.showRewarded().then(function(res){if(res&&res.ok){ev('ad_shown',{type:'rewarded',mode:res.mode});try{playAdDone()}catch(e){}maybeInterstitial();cb(true)}else{ev('ad_failed',{type:'rewarded',error:res&&res.error});cb(false);toast('Реклама недоступна. Открой игру внутри VK.','bad')}}).catch(function(err){ev('ad_failed',{type:'rewarded',error:String(err)});cb(false);toast('Реклама недоступна. Открой игру внутри VK.','bad')})}
+function grantBoost(){ensureAudio();rewardedThen(function(ok){if(!ok)return;state.boostUntil=Date.now()+cfg.boostMs;try{playBoost()}catch(e){}ev('ad_rewarded',{reward:'boost_x2_30s'});emit('boost',{boostUntil:state.boostUntil});bump(el.perSecond);render();toast('Буст x2 активирован!','good')})}
+function grantCollect(){ensureAudio();rewardedThen(function(ok){if(!ok)return;var amt=Math.floor(baseDps()*cfg.collectSecBase);state.crystals+=amt;bump(el.crystals);try{playCollect()}catch(e){}ev('ad_rewarded',{reward:'collect_60s',amount:amt});try{var r=el.mineBtn.getBoundingClientRect();floatText(r.left+r.width/2,r.top+r.height/2-30,'+'+fmt(amt),true);sparks(r.left+r.width/2,r.top+r.height/2,true)}catch(e){}render();toast('Собрано: ◆'+fmt(amt),'good')})}
+
+function dailyInfo(){var today=new Date(),tk=dayKey(today);if(state.lastClaimDay===tk)return{available:false};var streak=0;if(state.lastClaimDay){var diff=Math.round((midnight(today)-parseKey(state.lastClaimDay))/86400000);if(diff===1)streak=state.dailyStreak||0;else if(diff>=2)streak=0;else return{available:false}}var day=(streak%7)+1;var scaled=Math.floor(baseDps()*300);var reward=Math.max(DAILY[day-1],scaled);return{available:true,day:day,reward:reward,streak:streak}}
+function claimDaily(mult){var info=dailyInfo();if(!info.available)return 0;var amt=Math.floor(info.reward*mult);state.crystals+=amt;state.dailyStreak=info.streak+1;state.lastClaimDay=dayKey(new Date());if(info.day===7)state.boostUntil=Date.now()+cfg.dailyBoostMs;ev('daily_claimed',{day:info.day,reward:amt,x2:mult>1});save();render();return amt}
+function buildDailyGrid(info){el.dailyGrid.innerHTML='';for(var i=1;i<=7;i++){var cell=document.createElement('div');var cls='day-cell';if(i<info.day)cls+=' claimed';else if(i===info.day)cls+=' current';else cls+=' future';if(i===7)cls+=' big';cell.className=cls;cell.innerHTML='<span class="dc-num">'+i+'</span><span class="dc-val">'+fmt(DAILY[i-1])+'</span>';el.dailyGrid.appendChild(cell)}el.dailySub.textContent='День '+info.day+' из 7';el.dailyClaim.textContent='Забрать ◆'+fmt(info.reward);el.dailyX2.textContent='▶ Забрать x2 (◆'+fmt(info.reward*2)+')';if(info.day===7){el.dailyBonus.textContent='Бонус 7-го дня: мгновенный буст x2 на 60 секунд!';el.dailyBonus.classList.add('show')}else el.dailyBonus.classList.remove('show')}
+function openDailyModal(){var info=dailyInfo();if(!info.available)return;buildDailyGrid(info);el.dailyModal.classList.add('show')}
+function closeDailyModal(){el.dailyModal.classList.remove('show')}
+var _lds='';
+function updateDailyButton(){var info=dailyInfo(),txt,ready=!!info.available;if(ready)txt='Готово! Забрать ◆'+fmt(info.reward);else txt='Следующая через '+timeToNext();el.dailyBtn.classList.toggle('ready',ready);el.dailyBadge.style.display=ready?'block':'none';if(txt!==_lds){el.dailyStatus.textContent=txt;_lds=txt}}
+
+var pendingOffline=null;
+function computeOffline(){var now=Date.now();if(!state.lastSeen||state.lastSeen<=0){state.lastSeen=now;save();return null}var deltaSec=(now-state.lastSeen)/1000;state.lastSeen=now;if(deltaSec<cfg.offlineMinSec){save();return null}var sec=Math.min(deltaSec,cfg.offlineCapSec);var reward=Math.floor(baseDps()*sec*cfg.offlineRateBase);if(reward<=0){save();return null}ev('offline_calc',{sec:Math.round(sec),reward:reward});return{sec:sec,reward:reward,capped:deltaSec>cfg.offlineCapSec,claimed:false}}
+function showOfflineModal(off){pendingOffline=off;animateNumber(el.offlineAmount,0,off.reward,700);el.offlineNote.textContent='за '+humanTime(off.sec)+(off.capped?' (макс 2 ч)':'')+', ставка '+Math.round(cfg.offlineRateBase*100)+'%';el.offlineModal.classList.add('show')}
+function takeOffline(mult){if(!pendingOffline||pendingOffline.claimed)return;var amt=Math.floor(pendingOffline.reward*mult);state.crystals+=amt;pendingOffline.claimed=true;bump(el.crystals);ev('offline_reward',{amount:amt,x2:mult>1});save();render();el.offlineModal.classList.remove('show');pendingOffline=null;toast('Офлайн награда: ◆'+fmt(amt),'good');if(dailyInfo().available)openDailyModal()}
+function handleLoadFlow(){var off=computeOffline();if(off)showOfflineModal(off);else if(dailyInfo().available)openDailyModal()}
+
+function buildLegacy(){var gain=legacyGain();el.legShards.textContent=fmt(state.shards);el.legMult.textContent=formatMult(legacyMult());el.legGain.textContent='+'+fmt(gain);el.legNext.textContent=TIER_NAMES[Math.min(3,state.legacies+1)];el.legReq.textContent=canLegacy()?('Готово! Ты получишь +'+fmt(gain)+' осколков. Вечный множитель станет '+formatMult(Math.pow(cfg.legacyBaseMult,state.shards+gain))+'.'):('Нужно ◆'+fmt(threshold())+' кристаллов. Сейчас: ◆'+fmt(state.crystals)+'.');el.doLegacy.disabled=!canLegacy()}
+function openLegacy(){buildLegacy();el.legacyModal.classList.add('show')}
+function closeLegacy(){el.legacyModal.classList.remove('show')}
+function doLegacy(){ensureAudio();if(!canLegacy()){try{playDenied()}catch(e){}toast('Рано: нужно ◆'+fmt(threshold()),'bad');return}
+  var gain=legacyGain();var oldTier=getTier();state.shards+=gain;state.legacies++;state.crystals=0;state.drills=0;state.drones=0;state.picks=0;state.boostUntil=0;
+  try{playLegacy()}catch(e){}
+  document.body.classList.add('legacy-flash');setTimeout(function(){document.body.classList.remove('legacy-flash')},950);
+  shake();updateTier();save();updateMachineSound();render();buildLegacy();
+  ev('legacy_reset',{gain:gain,shards:state.shards,legacies:state.legacies,tier:getTier()});emit('legacy',{gain:gain});
+  toast('Корабль пересобран! +'+fmt(gain)+' осколков','gold');
+  if(getTier()>oldTier)setTimeout(function(){toast('Новый объект: '+TIER_NAMES[getTier()],'gold');try{playSkin()}catch(e){}},1000);
+}
+
+function resetSocialDay(){var tk=dayKey(new Date());if(state.social.counterDay!==tk){state.social.counterDay=tk;state.social.stealsToday=0;state.social.helpsToday=0}}
+function ensureFriends(){resetSocialDay();if(!state.social.friends||state.social.friends.length===0){var arr=[];for(var i=0;i<5;i++){arr.push({name:FRIEND_NAMES[i%FRIEND_NAMES.length],color:TIER_COLORS[i%TIER_COLORS.length],mult:0.65+Math.random()*1.55,helpedAt:0,stolenAt:0})}state.social.friends=arr;save()}}
+function friendLoot(f){var base=Math.max(500,baseDps()*90+state.crystals*0.0003);return Math.floor(base*(f&&f.mult||1))}
+function buildSocial(){ensureFriends();resetSocialDay();var now=Date.now();var html='';for(var i=0;i<state.social.friends.length;i++){var f=state.social.friends[i];var loot=friendLoot(f);var helpReady=(now-(f.helpedAt||0)>cfg.helpCd)&&state.social.helpsToday<cfg.maxHelps;var stealReady=(now-(f.stolenAt||0)>cfg.stealCd)&&state.social.stealsToday<cfg.maxSteals;html+='<div class="friend-card"><div class="avatar" style="background:'+f.color+'">'+f.name.charAt(0)+'</div><div class="friend-info"><div class="friend-name">'+f.name+'</div><div class="friend-loot">Ресурсы: ◆'+fmt(loot)+'</div></div><div class="friend-actions"><button class="btn mini-btn x2-btn" data-social="1" data-action="help" data-friend="'+i+'"'+(helpReady?'':' disabled')+'>Помочь</button><button class="btn mini-btn danger" data-social="1" data-action="steal" data-friend="'+i+'"'+(stealReady?'':' disabled')+'>Украсть</button></div></div>'}el.friendsList.innerHTML=html;el.socialInfo.textContent='Краж сегодня: '+state.social.stealsToday+'/'+cfg.maxSteals+' · Помощей: '+state.social.helpsToday+'/'+cfg.maxHelps+' · Соседи по галактике ждут помощи — и осторожности.'}
+function openSocial(){buildSocial();el.socialModal.classList.add('show')}
+function closeSocial(){el.socialModal.classList.remove('show')}
+function doSocial(action,idx){ensureAudio();resetSocialDay();var f=state.social.friends[idx];if(!f)return;var now=Date.now();
+  if(action==='help'){if(now-(f.helpedAt||0)<cfg.helpCd||state.social.helpsToday>=cfg.maxHelps){try{playDenied()}catch(e){}toast('Помощь недоступна','bad');return}var reward=Math.floor(friendLoot(f)*0.03+150);state.crystals+=reward;f.helpedAt=now;state.social.helpsToday++;try{playSocial('help')}catch(e){}bump(el.crystals);toast('Ты помог '+f.name+': +◆'+fmt(reward),'good');ev('social_help',{friend:f.name,reward:reward})}
+  if(action==='steal'){if(now-(f.stolenAt||0)<cfg.stealCd||state.social.stealsToday>=cfg.maxSteals){try{playDenied()}catch(e){}toast('Кража недоступна','bad');return}var loot=friendLoot(f);var reward=Math.floor(loot*0.18);state.crystals+=reward;f.stolenAt=now;f.mult=Math.max(0.25,f.mult*0.86);state.social.stealsToday++;try{playSocial('steal')}catch(e){}bump(el.crystals);toast('Украдено у '+f.name+': +◆'+fmt(reward),'gold');ev('social_steal',{friend:f.name,reward:reward})}
+  save();render();buildSocial();
+}
+function shareGame(){ensureAudio();var now=Date.now();if(now-(state.social.lastShare||0)<cfg.shareCd){try{playDenied()}catch(e){}toast('Шер недавно. Подожди немного.','bad');return}
+  state.social.lastShare=now;var text='Играю в Космическую шахту: ломаю астероиды, крашу планеты и пересобираю корабль. Заходи!';var url=location.href;
+  if(window.Platform){Platform.share({title:'Космическая шахта',text:text,url:url}).then(function(res){try{playSocial('share')}catch(e){}var bonus=Math.floor(Math.max(300,baseDps()*20));state.crystals+=bonus;bump(el.crystals);render();save();toast(res&&res.ok?'Отправлено / скопировано. Бонус ◆'+fmt(bonus):'Не удалось поделиться','good');ev('share_result',{ok:!!(res&&res.ok),mode:res&&res.mode,bonus:bonus})}).catch(function(){toast('Ошибка шаринга','bad')})}
+  else{toast('Platform не загружен','bad')}
+}
+
+function skinById(id){for(var i=0;i<SKINS.length;i++)if(SKINS[i].id===id)return SKINS[i];return null}
+function isUnlocked(id){return state.skins.unlocked.indexOf(id)>=0}
+function isActive(id){return state.skins.active===id}
+function buySkin(id){ensureAudio();var s=skinById(id);if(!s)return;if(isUnlocked(id)){state.skins.active=id;applyActiveSkin();save();render();buildShop();try{playSkin()}catch(e){}ev('skin_equipped',{id:id});return}if(state.crystals<s.price){try{playDenied()}catch(e){}return}state.crystals-=s.price;state.skins.unlocked.push(id);state.skins.active=id;applyActiveSkin();bump(el.crystals);save();render();buildShop();try{playSkin()}catch(e){}ev('skin_purchased',{id:id,price:s.price});toast('Скин открыт: '+s.name,'good')}
+function spinSkin(){ensureAudio();rewardedThen(function(ok){if(!ok)return;try{playSkin()}catch(e){}var locked=[];for(var i=0;i<SKINS.length;i++)if(!isUnlocked(SKINS[i].id)&&SKINS[i].price>0)locked.push(SKINS[i]);if(locked.length===0){var bonus=Math.floor(baseDps()*120+5000);state.crystals+=bonus;bump(el.crystals);el.spinResult.textContent='Все скины открыты! Бонус ◆'+fmt(bonus)+'.';ev('spin_dup',{bonus:bonus})}else{var pick=locked[Math.floor(Math.random()*locked.length)];state.skins.unlocked.push(pick.id);state.skins.active=pick.id;applyActiveSkin();el.spinResult.textContent='Выпал скин: '+pick.name+'!';ev('spin_win',{id:pick.id})}save();render();buildShop()})}
+function buildShop(){el.skinsGrid.innerHTML='';for(var i=0;i<SKINS.length;i++){var s=SKINS[i];var card=document.createElement('div');var cls='shop-card';if(isActive(s.id))cls+=' active';else if(isUnlocked(s.id))cls+=' owned';card.className=cls;var btn;if(isActive(s.id))btn='<button class="btn shop-buy active-btn" disabled>Активен</button>';else if(isUnlocked(s.id))btn='<button class="btn shop-buy" data-skin="'+s.id+'">Надеть</button>';else if(s.price===0)btn='<button class="btn shop-buy" data-skin="'+s.id+'">Надеть</button>';else btn='<button class="btn shop-buy" data-skin="'+s.id+'">Купить</button><div class="shop-price">'+fmt(s.price)+'</div>';card.innerHTML='<div class="skin-preview sp-'+s.id+'"></div><div class="shop-name">'+s.name+'</div><div class="shop-desc">'+s.desc+'</div>'+btn;el.skinsGrid.appendChild(card)}el.skinsGrid.onclick=function(e){var b=e.target.closest('[data-skin]');if(b)buySkin(b.getAttribute('data-skin'))}}
+function openShop(){buildShop();el.spinResult.textContent='';el.shopModal.classList.add('show')}
+function closeShop(){el.shopModal.classList.remove('show')}
+
+function save(){try{state.lastSeen=Date.now();localStorage.setItem(SAVE_KEY,JSON.stringify(state))}catch(e){}try{if(window.Platform)Platform.cloudSave(state)}catch(e){}}
+function load(){try{var raw=localStorage.getItem(SAVE_KEY);if(!raw)return;var d=JSON.parse(raw);for(var k in d){if(state.hasOwnProperty(k))state[k]=d[k]}}catch(e){}
+  if(typeof state.crystals!=='number')state.crystals=0;
+  if(typeof state.drills!=='number')state.drills=0;
+  if(typeof state.drones!=='number')state.drones=0;
+  if(typeof state.picks!=='number')state.picks=0;
+  if(typeof state.boostUntil!=='number')state.boostUntil=0;
+  if(typeof state.soundOn!=='boolean')state.soundOn=true;
+  if(typeof state.lastSeen!=='number')state.lastSeen=0;
+  if(typeof state.lastClaimDay!=='string')state.lastClaimDay='';
+  if(typeof state.dailyStreak!=='number')state.dailyStreak=0;
+  if(typeof state.shards!=='number')state.shards=0;
+  if(typeof state.legacies!=='number')state.legacies=0;
+  if(typeof state.bestCrystals!=='number')state.bestCrystals=0;
+  if(!state.skins||typeof state.skins!=='object')state.skins={unlocked:['std'],active:'std'};
+  if(!Array.isArray(state.skins.unlocked))state.skins.unlocked=['std'];
+  if(state.skins.unlocked.indexOf('std')<0)state.skins.unlocked.unshift('std');
+  if(typeof state.skins.active!=='string')state.skins.active='std';
+  if(!state.social||typeof state.social!=='object')state.social={friends:[],lastShare:0,stealsToday:0,helpsToday:0,counterDay:''};
+  if(!Array.isArray(state.social.friends))state.social.friends=[];
+  if(typeof state.social.lastShare!=='number')state.social.lastShare=0;
+  if(typeof state.social.stealsToday!=='number')state.social.stealsToday=0;
+  if(typeof state.social.helpsToday!=='number')state.social.helpsToday=0;
+  if(typeof state.social.counterDay!=='string')state.social.counterDay='';
+}
+function reset(){if(!confirm('Сбросить ВЕСЬ прогресс, включая осколки и наследия?'))return;state={crystals:0,drills:0,drones:0,picks:0,boostUntil:0,soundOn:state.soundOn,lastSeen:Date.now(),lastClaimDay:'',dailyStreak:0,skins:{unlocked:['std'],active:'std'},shards:0,legacies:0,bestCrystals:0,social:{friends:[],lastShare:0,stealsToday:0,helpsToday:0,counterDay:''}};applyActiveSkin();updateTier();save();updateMachineSound();render();ev('reset',{});emit('reset',{});toast('Полный сброс выполнен','bad')}
+function spawnJsStars(){for(var i=0;i<55;i++){var s=document.createElement('div');s.className='js-star';var sz=Math.random()*2.2+0.8;s.style.position='fixed';s.style.borderRadius='50%';s.style.background='#fff';s.style.pointerEvents='none';s.style.zIndex='0';s.style.boxShadow='0 0 5px rgba(255,255,255,.75)';s.style.transition='opacity 1.8s ease';s.style.width=sz+'px';s.style.height=sz+'px';s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*100+'vh';s.style.opacity=(Math.random()*0.55+0.18).toFixed(2);if(Math.random()<0.18){s.style.background='#9de7ff';s.style.boxShadow='0 0 7px rgba(125,249,255,.85)'}else if(Math.random()<0.12){s.style.background='#ffc7ef';s.style.boxShadow='0 0 7px rgba(255,122,217,.75)'}document.body.appendChild(s);(function(node){setInterval(function(){node.style.opacity=(Math.random()*0.65+0.18).toFixed(2)},1400+Math.random()*2400)})(s)}}
+
+el.mineBtn.addEventListener('pointerdown',function(e){mine(e)});
+el.mineBtn.addEventListener('contextmenu',function(e){e.preventDefault()});
+el.adBtn.addEventListener('click',grantBoost);
+el.collectBtn.addEventListener('click',grantCollect);
+el.saveBtn.addEventListener('click',function(){save();toast('Сохранено','good')});
+el.resetBtn.addEventListener('click',reset);
+el.soundBtn.addEventListener('click',toggleSound);
+el.shopBtn.addEventListener('click',openShop);
+el.shopClose.addEventListener('click',closeShop);
+el.spinBtn.addEventListener('click',spinSkin);
+el.legacyBtn.addEventListener('click',openLegacy);
+el.legacyClose.addEventListener('click',closeLegacy);
+el.doLegacy.addEventListener('click',doLegacy);
+el.socialBtn.addEventListener('click',openSocial);
+el.socialClose.addEventListener('click',closeSocial);
+el.shareBtn.addEventListener('click',shareGame);
+el.friendsList.addEventListener('click',function(e){var b=e.target.closest('[data-social]');if(b)doSocial(b.getAttribute('data-action'),parseInt(b.getAttribute('data-friend'),10))});
+el.buyDrill.addEventListener('click',function(){buy('drill')});
+el.buyDrone.addEventListener('click',function(){buy('drone')});
+el.buyPick.addEventListener('click',function(){buy('pick')});
+el.offlineTake.addEventListener('click',function(){ensureAudio();try{playOfflineReward()}catch(e){}takeOffline(1)});
+el.offlineX2.addEventListener('click',function(){ensureAudio();if(!pendingOffline||pendingOffline.claimed)return;rewardedThen(function(ok){if(ok)takeOffline(2)})});
+el.dailyBtn.addEventListener('click',function(){if(dailyInfo().available)openDailyModal();else{ensureAudio();try{playDenied()}catch(e){}el.dailyBtn.classList.remove('shake');void el.dailyBtn.offsetWidth;el.dailyBtn.classList.add('shake')}});
+el.dailyClose.addEventListener('click',closeDailyModal);
+el.dailyClaim.addEventListener('click',function(){ensureAudio();var a=claimDaily(1);if(a){try{playDailyReward()}catch(e){}bump(el.crystals);toast('Ежедневка: ◆'+fmt(a),'good')}closeDailyModal()});
+el.dailyX2.addEventListener('click',function(){ensureAudio();if(!dailyInfo().available){closeDailyModal();return}rewardedThen(function(ok){if(!ok)return;var a=claimDaily(2);if(a){try{playDailyReward()}catch(e){}bump(el.crystals);toast('Ежедневка x2: ◆'+fmt(a),'gold')}closeDailyModal()})});
+
+load();
+try{spawnJsStars()}catch(e){}
+applyActiveSkin();updateTier();applySound();render();
+if(window.Platform){Platform.init().then(function(res){ev('platform_ready',{env:Platform.env,adapter:Platform.adapter,target:Platform.target,mode:res&&res.mode});handleLoadFlow()}).catch(function(){handleLoadFlow()})}else handleLoadFlow();
+
+setInterval(function(){state.crystals+=dpsVal()/10;if(state.crystals>state.bestCrystals)state.bestCrystals=state.crystals;state.lastSeen=Date.now();render()},100);
+setInterval(save,10000);
+window.addEventListener('beforeunload',save);
+ev('game_open',{});
+})();
+</script>
+
+<script>
+(function(){
+var TUT_KEY='spaceMineTutorialV1';
+var SAVE_KEY='spaceMineLegacyV1';
+
+var coach=null;
+var idx=0;
+var active=false;
+var blockedByModal=false;
+
+var baseline={crystals:0,drills:0,boostUntil:0};
+
+var steps=[
+  {
+    id:'tap',
+    target:'#mineBtn',
+    text:'Тапай по небесному телу — так ты добываешь кристаллы.',
+    hint:'Можно нажимать быстро: будут комбо и криты.'
+  },
+  {
+    id:'drill',
+    target:'#buyDrill',
+    text:'Купи бур, когда хватит кристаллов. Он будет добывать автоматически.',
+    hint:'Буры продолжают работать даже когда ты закрыл игру.',
+    skip:function(save){return (save.drills||0)>0}
+  },
+  {
+    id:'boost',
+    target:'#adBtn',
+    text:'Реклама даёт временный x2. Используй её перед долгим перерывом.',
+    hint:'Это необязательно, но ускоряет прогресс.',
+    skip:function(save){return (save.legacies||0)>0||(save.shards||0)>0}
+  },
+  {
+    id:'finish',
+    target:'#dailyBtn',
+    text:'Заходи каждый день: ежедневная награда и офлайн-доход ускорят прогресс.',
+    hint:'Удачи, командир!',
+    nextLabel:'Играть'
+  }
+];
+
+function qs(sel){return document.querySelector(sel)}
+function getSave(){try{return JSON.parse(localStorage.getItem(SAVE_KEY)||'{}')}catch(e){return {}}}
+function loadFlag(){try{return JSON.parse(localStorage.getItem(TUT_KEY)||'null')}catch(e){return null}}
+function saveFlag(){try{localStorage.setItem(TUT_KEY,JSON.stringify({done:true,at:Date.now()}))}catch(e){}}
+function hasProgress(save){return (save.legacies||0)>0||(save.shards||0)>0||(save.drills||0)>0||(save.bestCrystals||0)>1000||(save.crystals||0)>1000}
+
+function ensureStyle(){
+  if(document.getElementById('tut-style'))return;
+  var st=document.createElement('style');
+  st.id='tut-style';
+  st.textContent=
+    '#tutCoach{position:fixed;left:50%;transform:translateX(-50%);z-index:105;width:min(92vw,380px);background:linear-gradient(180deg,rgba(18,26,50,.96),rgba(10,15,31,.96));border:1px solid rgba(125,249,255,.38);border-radius:18px;padding:12px 14px;box-shadow:0 12px 34px rgba(0,0,0,.45),0 0 22px rgba(125,249,255,.18);display:none;flex-direction:column;gap:9px;color:#eaf0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;pointer-events:auto;backdrop-filter:blur(4px)}'+
+    '#tutCoach.show{display:flex}'+
+    '#tutCoach .tut-text{font-size:14px;font-weight:900;line-height:1.35;text-shadow:0 2px 8px rgba(0,0,0,.45)}'+
+    '#tutCoach .tut-hint{font-size:11px;color:#9fb0d0;font-weight:700;line-height:1.35}'+
+    '#tutCoach .tut-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:2px}'+
+    '.tut-btn{border:1px solid rgba(125,249,255,.30);background:linear-gradient(180deg,rgba(125,249,255,.18),rgba(138,108,255,.18));color:#fff;border-radius:11px;padding:8px 11px;font-size:12px;font-weight:900;cursor:pointer;-webkit-tap-highlight-color:transparent}'+
+    '.tut-btn:active{transform:translateY(1px) scale(.98)}'+
+    '.tut-btn.skip{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.14);color:#9fb0d0}'+
+    '.tut-target{outline:3px solid #7df9ff !important;outline-offset:4px !important;box-shadow:0 0 0 4px rgba(125,249,255,.16),0 0 24px rgba(125,249,255,.34) !important;border-radius:16px}'+
+    '.mine-btn.tut-target{border-radius:50% !important}'+
+    '@keyframes tutPulse{0%,100%{outline-color:rgba(125,249,255,.95)}50%{outline-color:rgba(255,211,107,.95)}}';
+  document.head.appendChild(st);
+}
+
+function createCoach(){
+  if(coach)return;
+  coach=document.createElement('div');
+  coach.id='tutCoach';
+  coach.setAttribute('role','dialog');
+  coach.setAttribute('aria-live','polite');
+  coach.innerHTML=
+    '<div class="tut-text" id="tutText"></div>'+
+    '<div class="tut-hint" id="tutHint"></div>'+
+    '<div class="tut-actions">'+
+      '<button class="tut-btn skip" id="tutSkip">Пропустить</button>'+
+      '<button class="tut-btn" id="tutNext">Понятно</button>'+
+    '</div>';
+  document.body.appendChild(coach);
+  coach.querySelector('#tutSkip').addEventListener('click',function(e){e.stopPropagation();finishTutorial(true)});
+  coach.querySelector('#tutNext').addEventListener('click',function(e){e.stopPropagation();nextStep()});
+}
+
+function clearTarget(){var list=document.querySelectorAll('.tut-target');for(var i=0;i<list.length;i++)list[i].classList.remove('tut-target')}
+function isVisible(node){if(!node)return false;var r=node.getBoundingClientRect();var vh=window.innerHeight||document.documentElement.clientHeight;var vw=window.innerWidth||document.documentElement.clientWidth;return r.width>0&&r.height>0&&r.top>=-10&&r.left>=-10&&r.top<=vh+10&&r.left<=vw+10}
+function placeCoach(){if(!coach||!coach.classList.contains('show'))return;var s=currentStep();var t=s&&s.target?qs(s.target):null;var r=t?t.getBoundingClientRect():null;var vh=window.innerHeight||document.documentElement.clientHeight;if(r&&r.top>vh*0.52){coach.style.top='14px';coach.style.bottom='auto'}else{coach.style.top='auto';coach.style.bottom='14px'}}
+function anyModalOpen(){return !!document.querySelector('.modal.show')}
+function currentStep(){return steps[idx]||null}
+
+function showCurrent(resetBaseline){
+  var s=currentStep();
+  if(!s||!coach)return;
+  if(resetBaseline){
+    var save=getSave();
+    baseline={crystals:save.crystals||0,drills:save.drills||0,boostUntil:save.boostUntil||0};
+    coach.querySelector('#tutText').textContent=s.text;
+    coach.querySelector('#tutHint').textContent=s.hint||'';
+    coach.querySelector('#tutNext').textContent=s.nextLabel||'Понятно';
+  }
+  clearTarget();
+  var t=s.target?qs(s.target):null;
+  if(s.target&&!t){nextStep();return}
+  if(t){
+    t.classList.add('tut-target');
+    if(!isVisible(t)){try{t.scrollIntoView({behavior:'smooth',block:'center'})}catch(e){}}
+  }
+  coach.classList.add('show');
+  setTimeout(placeCoach,90);
+}
+
+function renderStep(){
+  var s=currentStep();
+  if(!s){finishTutorial(true);return}
+  var save=getSave();
+  if(s.skip&&s.skip(save)){nextStep();return}
+  showCurrent(true);
+  if(s.id==='finish'){setTimeout(function(){var cur=currentStep();if(active&&cur&&cur.id==='finish')finishTutorial(true)},9000)}
+}
+
+function nextStep(){
+  if(!active)return;
+  clearTarget();
+  idx++;
+  if(idx>=steps.length)finishTutorial(true);
+  else renderStep();
+}
+
+function finishTutorial(markDone){
+  active=false;
+  idx=steps.length;
+  if(coach)coach.classList.remove('show');
+  clearTarget();
+  if(markDone)saveFlag();
+}
+
+function onSmTap(){if(!active)return;var s=currentStep();if(s&&s.id==='tap')nextStep()}
+function onSmBuy(e){if(!active)return;var s=currentStep();if(s&&s.id==='drill'&&e&&e.detail&&(e.detail.drills||0)>baseline.drills)nextStep()}
+function onSmBoost(e){if(!active)return;var s=currentStep();if(s&&s.id==='boost'&&e&&e.detail&&(e.detail.boostUntil||0)>baseline.boostUntil)nextStep()}
+
+function tick(){
+  if(!active)return;
+  var blocked=anyModalOpen();
+  if(blocked){
+    if(!blockedByModal){blockedByModal=true;if(coach)coach.classList.remove('show');clearTarget()}
+    return;
+  }
+  if(blockedByModal){blockedByModal=false;showCurrent(false)}
+  var s=currentStep();
+  if(!s)return;
+  var save=getSave();
+  if(s.id==='tap'&&(save.crystals||0)>baseline.crystals){nextStep();return}
+  if(s.id==='drill'&&(save.drills||0)>baseline.drills){nextStep();return}
+  if(s.id==='boost'&&(save.boostUntil||0)>baseline.boostUntil){nextStep();return}
+}
+
+function init(){
+  ensureStyle();
+  createCoach();
+  var flag=loadFlag();
+  if(flag&&flag.done)return;
+  var save=getSave();
+  if(hasProgress(save)){finishTutorial(true);return}
+  active=true;
+  idx=0;
+  window.addEventListener('sm_tap',onSmTap);
+  window.addEventListener('sm_buy',onSmBuy);
+  window.addEventListener('sm_boost',onSmBoost);
+  window.addEventListener('resize',placeCoach);
+  window.addEventListener('scroll',placeCoach,true);
+  setInterval(tick,500);
+  renderStep();
+}
+
+function safeStart(){
+  var tries=0;
+  function attempt(){
+    if(qs('#mineBtn')){init();return}
+    tries++;
+    if(tries<25)setTimeout(attempt,300);
+  }
+  setTimeout(attempt,800);
+}
+
+window.addEventListener('load',safeStart);
+})();
+</script>
 </body>
 </html>
